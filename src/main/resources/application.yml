@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: lstrainer-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lstrainer
+    username: lstrainer_user
+    password: lstrainer_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+server:
+  port: 8080
+
+# Configurações de segurança JWT
+app:
+  jwt:
+    # Segredo em Base64 — NUNCA comite um segredo real no git.
+    # Em produção, sobrescreva via variável de ambiente: APP_JWT_SECRET
+    secret: ${APP_JWT_SECRET:bHN0cmFpbmVyLXNlY3JldC1rZXktcGFyYS1kZXNlbnZvbHZpbWVudG8tbG9jYWwtbmFvLXVzZS1lbS1wcm9kdWNhby0yMDI1}
+    expiration-ms: 28800000  # 8 horas
+    cookie-name: AUTH_TOKEN
+    cookie-secure: false     # true em produção (HTTPS)
+    cookie-same-site: Strict
