@@ -1,5 +1,6 @@
-package com.lstrainer.lstrainer_api.professor;
+package com.lstrainer.lstrainer_api.auth;
 
+import com.lstrainer.lstrainer_api.professor.ProfessorService;
 import com.lstrainer.lstrainer_api.professor.dto.LoginRequest;
 import com.lstrainer.lstrainer_api.professor.dto.ProfessorResponse;
 import com.lstrainer.lstrainer_api.security.CookieService;

@@ -15,4 +15,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     Page<Aluno> findByProfessorId(Long professorId, Pageable pageable);
 
     Optional<Aluno> findByIdAndProfessorId(Long id, Long professorId);
+
+    // NOVO MÉTODO: Conta os alunos do professor diretamente no banco de dados
+    long countByProfessorId(Long professorId);
 }
