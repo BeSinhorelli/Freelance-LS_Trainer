@@ -9,4 +9,5 @@ import java.util.List;
 public interface ItemFichaTreinoRepository extends JpaRepository<ItemFichaTreino, Long> {
     List<ItemFichaTreino> findByFichaIdOrderByOrdemAsc(Long fichaId);
     void deleteByFichaId(Long fichaId);
+    void deleteByExercicioId(Long exercicioId); // <-- NOVO MÉTODO ADICIONADO AQUI
 }

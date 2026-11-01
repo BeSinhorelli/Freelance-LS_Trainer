@@ -33,7 +33,6 @@ public class FichaTreinoService {
 
     @Transactional(readOnly = true)
     public Page<FichaTreinoResponse> listarPorAluno(Long alunoId, Long professorId, Pageable pageable) {
-        // Valida se o aluno pertence ao professor
         alunoRepository.findByIdAndProfessorId(alunoId, professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Aluno", alunoId));
 
@@ -71,7 +70,6 @@ public class FichaTreinoService {
     public FichaTreinoResponse atualizar(Long id, FichaTreinoRequest request, Long professorId) {
         FichaTreino ficha = findFichaByIdAndProfessor(id, professorId);
 
-        // Se o aluno for alterado, valida se o novo aluno pertence ao professor
         if (!ficha.getAluno().getId().equals(request.alunoId())) {
             Aluno novoAluno = alunoRepository.findByIdAndProfessorId(request.alunoId(), professorId)
                     .orElseThrow(() -> new ResourceNotFoundException("Aluno", request.alunoId()));

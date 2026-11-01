@@ -41,8 +41,8 @@ public class ExercicioController {
     public ResponseEntity<ExercicioResponse> criar(
             @Valid @RequestBody ExercicioRequest request,
             @AuthenticationPrincipal ProfessorUserDetails user) {
-        ExercicioResponse criado = exercicioService.criar(request, user.getProfessorId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(criado);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(exercicioService.criar(request, user.getProfessorId()));
     }
 
     @PutMapping("/{id}")
@@ -66,6 +66,14 @@ public class ExercicioController {
             @PathVariable Long id,
             @AuthenticationPrincipal ProfessorUserDetails user) {
         exercicioService.reativar(id, user.getProfessorId());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(
+            @PathVariable Long id,
+            @AuthenticationPrincipal ProfessorUserDetails user) {
+        exercicioService.deletar(id, user.getProfessorId());
         return ResponseEntity.noContent().build();
     }
 }

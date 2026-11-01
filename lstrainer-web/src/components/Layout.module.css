@@ -1,0 +1,167 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+}
+
+/* TOPBAR */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 0.75rem 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  z-index: 10;
+}
+
+.menuBtn {
+  display: none;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1e3a8a;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoIcon {
+  background: #1e40af;
+  color: white;
+  font-weight: bold;
+  padding: 0.6rem;
+  border-radius: 50%;
+  font-size: 1.2rem;
+}
+
+.logo h1 {
+  font-size: 1.1rem;
+  color: #333;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.logo p {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.logoutBtn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.logoutBtn:hover {
+  background: #fecaca;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 250px;
+  background: #ffffff;
+  position: fixed;
+  top: 65px;
+  bottom: 0;
+  left: 0;
+  border-right: 1px solid #e2e8f0;
+  padding: 1.5rem 1rem;
+  transition: transform 0.3s ease;
+  z-index: 9;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #475569;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.navItem:hover {
+  background: #f1f5f9;
+  color: #1e40af;
+}
+
+.active {
+  background: #e0e7ff;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.navIcon {
+  font-size: 1.1rem;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  margin-left: 250px;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+}
+
+.overlay {
+  display: none;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .menuBtn { display: block; }
+  .logo p { display: none; }
+  .userInfo span { display: none; }
+  
+  .sidebar {
+    transform: translateX(-100%);
+    top: 0;
+    padding-top: 5rem;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .main {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  
+  .overlay {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 8;
+  }
+}

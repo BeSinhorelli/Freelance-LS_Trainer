@@ -9,15 +9,19 @@ import com.lstrainer.lstrainer_api.professor.Professor;
 import com.lstrainer.lstrainer_api.professor.ProfessorRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
 public class AvaliacaoFisicaService {
+
     private final AvaliacaoFisicaRepository avaliacaoRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
 
-    public AvaliacaoFisicaService(AvaliacaoFisicaRepository avaliacaoRepository, AlunoRepository alunoRepository, ProfessorRepository professorRepository) {
+    public AvaliacaoFisicaService(AvaliacaoFisicaRepository avaliacaoRepository, 
+                                  AlunoRepository alunoRepository, 
+                                  ProfessorRepository professorRepository) {
         this.avaliacaoRepository = avaliacaoRepository;
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;
@@ -41,6 +45,26 @@ public class AvaliacaoFisicaService {
                 .pesoKg(request.pesoKg()).alturaCm(request.alturaCm()).observacoes(request.observacoes())
                 .build();
         return AvaliacaoFisicaResponse.from(avaliacaoRepository.save(avaliacao));
+    }
+
+    @Transactional
+    public AvaliacaoFisicaResponse atualizar(Long id, AvaliacaoFisicaRequest request, Long professorId) {
+        AvaliacaoFisica avaliacao = avaliacaoRepository.findByIdAndProfessorId(id, professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Avaliação", id));
+
+        // Se mudou o aluno, valida se o novo aluno pertence ao professor
+        if (!avaliacao.getAluno().getId().equals(request.alunoId())) {
+            Aluno novoAluno = alunoRepository.findByIdAndProfessorId(request.alunoId(), professorId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Aluno", request.alunoId()));
+            avaliacao.setAluno(novoAluno);
+        }
+
+        avaliacao.setData(request.data());
+        avaliacao.setPesoKg(request.pesoKg());
+        avaliacao.setAlturaCm(request.alturaCm());
+        avaliacao.setObservacoes(request.observacoes());
+
+        return AvaliacaoFisicaResponse.from(avaliacao);
     }
 
     @Transactional

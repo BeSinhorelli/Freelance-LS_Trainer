@@ -9,15 +9,19 @@ import com.lstrainer.lstrainer_api.professor.Professor;
 import com.lstrainer.lstrainer_api.professor.ProfessorRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
 public class PrescricaoCardioService {
+
     private final PrescricaoCardioRepository cardioRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
 
-    public PrescricaoCardioService(PrescricaoCardioRepository cardioRepository, AlunoRepository alunoRepository, ProfessorRepository professorRepository) {
+    public PrescricaoCardioService(PrescricaoCardioRepository cardioRepository, 
+                                   AlunoRepository alunoRepository, 
+                                   ProfessorRepository professorRepository) {
         this.cardioRepository = cardioRepository;
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;
@@ -41,6 +45,25 @@ public class PrescricaoCardioService {
                 .duracaoMinutos(request.duracaoMinutos()).frequenciaSemanal(request.frequenciaSemanal()).observacoes(request.observacoes())
                 .build();
         return PrescricaoCardioResponse.from(cardioRepository.save(cardio));
+    }
+
+    @Transactional
+    public PrescricaoCardioResponse atualizar(Long id, PrescricaoCardioRequest request, Long professorId) {
+        PrescricaoCardio cardio = cardioRepository.findByIdAndProfessorId(id, professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Prescrição Cardio", id));
+
+        if (!cardio.getAluno().getId().equals(request.alunoId())) {
+            Aluno novoAluno = alunoRepository.findByIdAndProfessorId(request.alunoId(), professorId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Aluno", request.alunoId()));
+            cardio.setAluno(novoAluno);
+        }
+
+        cardio.setModalidade(request.modalidade());
+        cardio.setDuracaoMinutos(request.duracaoMinutos());
+        cardio.setFrequenciaSemanal(request.frequenciaSemanal());
+        cardio.setObservacoes(request.observacoes());
+
+        return PrescricaoCardioResponse.from(cardio);
     }
 
     @Transactional

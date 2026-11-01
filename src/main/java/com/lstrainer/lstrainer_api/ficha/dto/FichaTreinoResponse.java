@@ -21,7 +21,7 @@ public record FichaTreinoResponse(
         return new FichaTreinoResponse(
                 f.getId(),
                 f.getAluno().getId(),
-                f.getAluno().getNome(),
+                f.getAluno().getNome(), // Incluído para o Dashboard
                 f.getObjetivo(),
                 f.getStatus(),
                 f.getDataCriacao(),

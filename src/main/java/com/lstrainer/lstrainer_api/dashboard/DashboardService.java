@@ -20,9 +20,7 @@ public class DashboardService {
 
     @Transactional(readOnly = true)
     public DashboardResponse obterResumo(Long professorId) {
-        // Usa countByProfessorId (SELECT COUNT) em vez de carregar a página inteira
         long alunosAtivos = alunoRepository.countByProfessorId(professorId);
-
         long fichasAtivas = fichaRepository.countByProfessorIdAndStatus(professorId, "ATIVA");
 
         LocalDate hoje = LocalDate.now();

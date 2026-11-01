@@ -4,6 +4,8 @@ import com.lstrainer.lstrainer_api.exception.BusinessException;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.exercicio.dto.ExercicioRequest;
 import com.lstrainer.lstrainer_api.exercicio.dto.ExercicioResponse;
+import com.lstrainer.lstrainer_api.ficha.ItemFichaTreino;
+import com.lstrainer.lstrainer_api.ficha.ItemFichaTreinoRepository;
 import com.lstrainer.lstrainer_api.professor.Professor;
 import com.lstrainer.lstrainer_api.professor.ProfessorRepository;
 import org.springframework.data.domain.Page;
@@ -11,16 +13,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class ExercicioService {
 
     private final ExercicioRepository exercicioRepository;
     private final ProfessorRepository professorRepository;
+    private final ItemFichaTreinoRepository itemFichaTreinoRepository;
 
     public ExercicioService(ExercicioRepository exercicioRepository,
-                            ProfessorRepository professorRepository) {
+                            ProfessorRepository professorRepository,
+                            ItemFichaTreinoRepository itemFichaTreinoRepository) {
         this.exercicioRepository = exercicioRepository;
         this.professorRepository = professorRepository;
+        this.itemFichaTreinoRepository = itemFichaTreinoRepository;
     }
 
     @Transactional(readOnly = true)
@@ -81,6 +88,18 @@ public class ExercicioService {
             throw new BusinessException("Exercício já está ativo");
         }
         exercicio.setAtivo(true);
+    }
+
+    @Transactional
+    public void deletar(Long id, Long professorId) {
+        Exercicio exercicio = findExercicioByIdAndProfessor(id, professorId);
+
+        // O ideal é que o ItemFichaTreinoRepository tenha um método deleteByExercicioId
+        // Se não tiver, você precisa adicioná-lo na interface ItemFichaTreinoRepository.
+        // Por enquanto, vamos assumir que temos.
+        itemFichaTreinoRepository.deleteByExercicioId(exercicio.getId());
+
+        exercicioRepository.delete(exercicio);
     }
 
     private Exercicio findExercicioByIdAndProfessor(Long id, Long professorId) {

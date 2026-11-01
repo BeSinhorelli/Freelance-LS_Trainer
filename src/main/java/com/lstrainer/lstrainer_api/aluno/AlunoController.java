@@ -68,4 +68,12 @@ public class AlunoController {
         alunoService.reativar(id, user.getProfessorId());
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(
+            @PathVariable Long id,
+            @AuthenticationPrincipal ProfessorUserDetails user) {
+        alunoService.deletar(id, user.getProfessorId());
+        return ResponseEntity.noContent().build();
+    }
 }

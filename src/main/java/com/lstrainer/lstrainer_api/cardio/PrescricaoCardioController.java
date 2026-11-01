@@ -8,13 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/cardio")
 public class PrescricaoCardioController {
+
     private final PrescricaoCardioService cardioService;
-    public PrescricaoCardioController(PrescricaoCardioService cardioService) { this.cardioService = cardioService; }
+
+    public PrescricaoCardioController(PrescricaoCardioService cardioService) {
+        this.cardioService = cardioService;
+    }
 
     @GetMapping
     public ResponseEntity<List<PrescricaoCardioResponse>> listar(@RequestParam Long alunoId, @AuthenticationPrincipal ProfessorUserDetails user) {
@@ -24,6 +29,14 @@ public class PrescricaoCardioController {
     @PostMapping
     public ResponseEntity<PrescricaoCardioResponse> criar(@Valid @RequestBody PrescricaoCardioRequest request, @AuthenticationPrincipal ProfessorUserDetails user) {
         return ResponseEntity.status(HttpStatus.CREATED).body(cardioService.criar(request, user.getProfessorId()));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PrescricaoCardioResponse> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody PrescricaoCardioRequest request,
+            @AuthenticationPrincipal ProfessorUserDetails user) {
+        return ResponseEntity.ok(cardioService.atualizar(id, request, user.getProfessorId()));
     }
 
     @DeleteMapping("/{id}")
