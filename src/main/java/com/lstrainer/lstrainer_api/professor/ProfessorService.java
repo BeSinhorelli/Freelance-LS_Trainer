@@ -2,8 +2,10 @@ package com.lstrainer.lstrainer_api.professor;
 
 import com.lstrainer.lstrainer_api.exception.BusinessException;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
+import com.lstrainer.lstrainer_api.professor.dto.PasswordUpdateRequest;
 import com.lstrainer.lstrainer_api.professor.dto.ProfessorResponse;
 import com.lstrainer.lstrainer_api.professor.dto.ProfessorUpdateRequest;
+import com.lstrainer.lstrainer_api.professor.dto.RegisterRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +16,27 @@ import java.util.Optional;
 public class ProfessorService {
 
     private final ProfessorRepository professorRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public ProfessorService(ProfessorRepository professorRepository) {
+    public ProfessorService(ProfessorRepository professorRepository, PasswordEncoder passwordEncoder) {
         this.professorRepository = professorRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Transactional
+    public ProfessorResponse registrar(RegisterRequest request) {
+        if (professorRepository.findByEmail(request.email()).isPresent()) {
+            throw new BusinessException("Já existe um professor com este e-mail.");
+        }
+
+        Professor novoProfessor = Professor.builder()
+                .nome(request.nome())
+                .email(request.email())
+                .senhaHash(passwordEncoder.encode(request.senha()))
+                .ativo(true)
+                .build();
+
+        return ProfessorResponse.from(professorRepository.save(novoProfessor));
     }
 
     @Transactional(readOnly = true)
@@ -31,18 +51,31 @@ public class ProfessorService {
         Professor professor = professorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor", id));
 
+        // Se o e-mail foi alterado, verifica se o novo já existe
         if (!professor.getEmail().equalsIgnoreCase(request.email())) {
             Optional<Professor> existente = professorRepository.findByEmail(request.email());
             if (existente.isPresent() && !existente.get().getId().equals(id)) {
-                throw new BusinessException("Já existe um professor com o e-mail informado");
+                throw new BusinessException("Já existe outro professor com este e-mail.");
             }
         }
 
         professor.setNome(request.nome());
         professor.setEmail(request.email());
 
-        // Não salvamos explicitamente: dentro de uma transação,
-        // o Hibernate detecta mudanças (dirty checking) e faz o UPDATE.
         return ProfessorResponse.from(professor);
+    }
+
+    // NOVO MÉTODO: Alterar senha
+    @Transactional
+    public void atualizarSenha(Long id, PasswordUpdateRequest request) {
+        Professor professor = professorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Professor", id));
+
+        // Verifica se a senha antiga confere
+        if (!passwordEncoder.matches(request.senhaAtual(), professor.getSenhaHash())) {
+            throw new BusinessException("A senha atual está incorreta.");
+        }
+
+        professor.setSenhaHash(passwordEncoder.encode(request.novaSenha()));
     }
 }

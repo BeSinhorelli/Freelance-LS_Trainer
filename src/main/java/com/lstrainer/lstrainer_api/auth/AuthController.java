@@ -3,11 +3,13 @@ package com.lstrainer.lstrainer_api.auth;
 import com.lstrainer.lstrainer_api.professor.ProfessorService;
 import com.lstrainer.lstrainer_api.professor.dto.LoginRequest;
 import com.lstrainer.lstrainer_api.professor.dto.ProfessorResponse;
+import com.lstrainer.lstrainer_api.professor.dto.RegisterRequest;
 import com.lstrainer.lstrainer_api.security.CookieService;
 import com.lstrainer.lstrainer_api.security.JwtService;
 import com.lstrainer.lstrainer_api.security.ProfessorUserDetails;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +34,13 @@ public class AuthController {
         this.jwtService = jwtService;
         this.cookieService = cookieService;
         this.professorService = professorService;
+    }
+
+    // NOVO ENDPOINT: Cadastro de professor
+    @PostMapping("/register")
+    public ResponseEntity<ProfessorResponse> register(@Valid @RequestBody RegisterRequest request) {
+        ProfessorResponse novoProfessor = professorService.registrar(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoProfessor);
     }
 
     @PostMapping("/login")

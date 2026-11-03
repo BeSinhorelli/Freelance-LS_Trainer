@@ -25,9 +25,11 @@ public class ExercicioController {
     @GetMapping
     public ResponseEntity<Page<ExercicioResponse>> listar(
             @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String grupoMuscular,
+            @RequestParam(required = false) Boolean ativo,
             @PageableDefault(size = 20, sort = "nome") Pageable pageable,
             @AuthenticationPrincipal ProfessorUserDetails user) {
-        return ResponseEntity.ok(exercicioService.listar(user.getProfessorId(), nome, pageable));
+        return ResponseEntity.ok(exercicioService.listar(user.getProfessorId(), nome, grupoMuscular, ativo, pageable));
     }
 
     @GetMapping("/{id}")
