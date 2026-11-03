@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // <-- Importação do Link
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export function LoginPage() {
@@ -70,11 +70,17 @@ export function LoginPage() {
           {carregando ? 'Entrando...' : 'Entrar no Sistema'}
         </button>
 
-        {/* NOVO BLOCO: Link para a tela de Cadastro */}
         <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
           <span style={{ color: '#64748b', fontSize: '0.9rem' }}>Não tem uma conta? </span>
           <Link to="/register" style={{ color: '#1e40af', fontWeight: 'bold', fontSize: '0.9rem', textDecoration: 'none' }}>
             Cadastre-se
+          </Link>
+        </div>
+
+        {/* NOVO LINK DE RECUPERAÇÃO */}
+        <div style={{ textAlign: 'center' }}>
+          <Link to="/recuperar-senha" style={{ color: '#64748b', fontSize: '0.85rem', textDecoration: 'underline' }}>
+            Esqueci minha senha
           </Link>
         </div>
       </form>

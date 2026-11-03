@@ -51,7 +51,6 @@ public class ProfessorService {
         Professor professor = professorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor", id));
 
-        // Se o e-mail foi alterado, verifica se o novo já existe
         if (!professor.getEmail().equalsIgnoreCase(request.email())) {
             Optional<Professor> existente = professorRepository.findByEmail(request.email());
             if (existente.isPresent() && !existente.get().getId().equals(id)) {
@@ -65,17 +64,24 @@ public class ProfessorService {
         return ProfessorResponse.from(professor);
     }
 
-    // NOVO MÉTODO: Alterar senha
     @Transactional
     public void atualizarSenha(Long id, PasswordUpdateRequest request) {
         Professor professor = professorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor", id));
 
-        // Verifica se a senha antiga confere
         if (!passwordEncoder.matches(request.senhaAtual(), professor.getSenhaHash())) {
             throw new BusinessException("A senha atual está incorreta.");
         }
 
         professor.setSenhaHash(passwordEncoder.encode(request.novaSenha()));
+    }
+
+    // NOVO MÉTODO DE RECUPERAÇÃO DE SENHA
+    @Transactional
+    public void recuperarSenha(String email, String novaSenha) {
+        Professor professor = professorRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Nenhum professor encontrado com este e-mail."));
+        
+        professor.setSenhaHash(passwordEncoder.encode(novaSenha));
     }
 }

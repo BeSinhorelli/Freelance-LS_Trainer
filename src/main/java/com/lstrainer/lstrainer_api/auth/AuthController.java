@@ -17,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -36,7 +38,6 @@ public class AuthController {
         this.professorService = professorService;
     }
 
-    // NOVO ENDPOINT: Cadastro de professor
     @PostMapping("/register")
     public ResponseEntity<ProfessorResponse> register(@Valid @RequestBody RegisterRequest request) {
         ProfessorResponse novoProfessor = professorService.registrar(request);
@@ -69,5 +70,19 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<ProfessorResponse> me(@AuthenticationPrincipal ProfessorUserDetails userDetails) {
         return ResponseEntity.ok(professorService.findById(userDetails.getProfessorId()));
+    }
+
+    // NOVO ENDPOINT DE RECUPERAÇÃO
+    @PostMapping("/recuperar-senha")
+    public ResponseEntity<Void> recuperarSenha(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String novaSenha = request.get("novaSenha");
+
+        if (email == null || novaSenha == null || novaSenha.length() < 6) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        professorService.recuperarSenha(email, novaSenha);
+        return ResponseEntity.ok().build();
     }
 }
