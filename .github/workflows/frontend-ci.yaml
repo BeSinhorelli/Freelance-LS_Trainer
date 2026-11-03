@@ -11,24 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout código
-      uses: actions/checkout@v4
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-    - name: Configurar Node.js 22
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22'
-        cache: 'npm'
-        cache-dependency-path: './lstrainer-web/package-lock.json'
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: './lstrainer-web/package-lock.json'
 
-    - name: Instalar dependências
-      working-directory: ./lstrainer-web
-      run: npm ci
+      - name: Instalar dependências
+        working-directory: ./lstrainer-web # O Frontend continua na subpasta
+        run: npm ci
 
-    - name: Rodar testes (Vitest)
-      working-directory: ./lstrainer-web
-      run: npm test -- --run
+      - name: Rodar testes (Vitest)
+        working-directory: ./lstrainer-web
+        run: npm test -- --run
 
-    - name: Build de produção
-      working-directory: ./lstrainer-web
-      run: npm run build
+      - name: Build de produção
+        working-directory: ./lstrainer-web
+        run: npm run build
