@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
 import styles from './ExerciciosPage.module.css';
@@ -15,8 +15,10 @@ interface Exercicio {
 export function ExerciciosPage() {
   const [exercicios, setExercicios] = useState<Exercicio[]>([]);
   const [busca, setBusca] = useState('');
+  const [grupoFiltro, setGrupoFiltro] = useState('');
+  const [statusFiltro, setStatusFiltro] = useState<string>('todos');
   const [loading, setLoading] = useState(true);
-
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [exercicioEditando, setExercicioEditando] = useState<Exercicio | null>(null);
 
@@ -26,15 +28,24 @@ export function ExerciciosPage() {
   const [instrucoes, setInstrucoes] = useState('');
   const [erro, setErro] = useState('');
 
+  const gruposMusculares = [
+    'Peitoral', 'Costas', 'Pernas', 'Ombros', 'Bíceps', 'Tríceps', 'Abdômen', 'Glúteos', 'Panturrilha', 'Cardio'
+  ];
+
   useEffect(() => {
     carregarExercicios();
-  }, [busca]);
+  }, [busca, grupoFiltro, statusFiltro]);
 
   async function carregarExercicios() {
     try {
       setLoading(true);
-      const url = busca ? `/exercicios?nome=${busca}` : '/exercicios';
-      const response = await api.get(url);
+      const params = new URLSearchParams();
+      if (busca) params.append('nome', busca);
+      if (grupoFiltro) params.append('grupoMuscular', grupoFiltro);
+      if (statusFiltro === 'ativos') params.append('ativo', 'true');
+      if (statusFiltro === 'inativos') params.append('ativo', 'false');
+
+      const response = await api.get(`/exercicios?${params.toString()}`);
       setExercicios(response.data.content || response.data);
     } catch (error) {
       toast.error('Erro ao buscar exercícios');
@@ -45,25 +56,19 @@ export function ExerciciosPage() {
 
   function abrirModalNovo() {
     setExercicioEditando(null);
-    setNome('');
-    setGrupo('');
-    setDescricao('');
-    setInstrucoes('');
-    setErro('');
+    setNome(''); setGrupo(''); setDescricao(''); setInstrucoes(''); setErro('');
     setIsModalOpen(true);
   }
 
-  // AQUI ESTÁ A CORREÇÃO: Busca os dados completos antes de abrir o modal
   async function abrirModalEditar(ex: Exercicio) {
     try {
       const response = await api.get(`/exercicios/${ex.id}`);
-      const dadosCompletos = response.data;
-
-      setExercicioEditando(dadosCompletos);
-      setNome(dadosCompletos.nome);
-      setGrupo(dadosCompletos.grupoMuscular || '');
-      setDescricao(dadosCompletos.descricao || '');
-      setInstrucoes(dadosCompletos.instrucoes || '');
+      const dados = response.data;
+      setExercicioEditando(dados);
+      setNome(dados.nome);
+      setGrupo(dados.grupoMuscular || '');
+      setDescricao(dados.descricao || '');
+      setInstrucoes(dados.instrucoes || '');
       setErro('');
       setIsModalOpen(true);
     } catch (error) {
@@ -74,7 +79,7 @@ export function ExerciciosPage() {
   async function handleSalvar(e: FormEvent) {
     e.preventDefault();
     setErro('');
-
+    
     const payload = {
       nome,
       grupoMuscular: grupo || null,
@@ -123,75 +128,103 @@ export function ExerciciosPage() {
   }
 
   return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h2>Biblioteca de Exercícios</h2>
-          <button className={styles.newBtn} onClick={abrirModalNovo}>+ Novo Exercício</button>
-        </div>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h2>Biblioteca de Exercícios</h2>
+        <button className={styles.newBtn} onClick={abrirModalNovo}>+ Novo Exercício</button>
+      </div>
 
-        <div className={styles.searchBar}>
-          <span className={styles.searchIcon}>🔍</span>
+      {/* BARRA DE FILTROS */}
+      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', background: 'white', padding: '1rem', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
+          <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}>🔍</span>
           <input
-              type="text"
-              placeholder="Pesquisar exercício..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
+            type="text"
+            placeholder="Pesquisar por nome..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            style={{ width: '100%', padding: '0.7rem 1rem 0.7rem 2.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
           />
         </div>
 
-        <div className={styles.list}>
-          {loading && <p>Carregando...</p>}
-          {!loading && exercicios.length === 0 && <p className={styles.empty}>Nenhum exercício cadastrado.</p>}
+        <select 
+          value={grupoFiltro} 
+          onChange={(e) => setGrupoFiltro(e.target.value)}
+          style={{ padding: '0.7rem', borderRadius: '6px', border: '1px solid #cbd5e1', color: '#475569', minWidth: '150px' }}
+        >
+          <option value="">Todos os Grupos</option>
+          {gruposMusculares.map(g => <option key={g} value={g}>{g}</option>)}
+        </select>
 
-          {exercicios.map(ex => (
-              <div key={ex.id} className={styles.card}>
-                <div className={styles.info}>
-                  <h3>{ex.nome}</h3>
-                  <p>{ex.grupoMuscular || 'Grupo não informado'} • {ex.ativo ? 'Ativo' : 'Inativo'}</p>
-                </div>
-                <div className={styles.actions}>
-                  <button onClick={() => toggleStatus(ex)} title={ex.ativo ? 'Desativar' : 'Reativar'}>
-                    {ex.ativo ? '🚫' : '✅'}
-                  </button>
-                  <button onClick={() => abrirModalEditar(ex)} title="Editar">✏️</button>
-                  <button onClick={() => deletarExercicio(ex)} title="Excluir Definitivamente" style={{ color: '#dc2626' }}>🗑️</button>
-                </div>
-              </div>
-          ))}
-        </div>
-
-        {isModalOpen && (
-            <div className={styles.overlay} onClick={() => setIsModalOpen(false)}>
-              <div className={styles.modal} onClick={e => e.stopPropagation()}>
-                <h2>{exercicioEditando ? 'Editar Exercício' : 'Novo Exercício'}</h2>
-                <form onSubmit={handleSalvar} className={styles.form}>
-                  <div className={styles.field}>
-                    <label>Nome do Exercício *</label>
-                    <input type="text" value={nome} onChange={e => setNome(e.target.value)} required />
-                  </div>
-                  <div className={styles.field}>
-                    <label>Grupo Muscular</label>
-                    <input type="text" value={grupo} onChange={e => setGrupo(e.target.value)} placeholder="Ex: Peitoral, Costas..." />
-                  </div>
-                  <div className={styles.field}>
-                    <label>Descrição</label>
-                    <input type="text" value={descricao} onChange={e => setDescricao(e.target.value)} />
-                  </div>
-                  <div className={styles.field}>
-                    <label>Instruções de Execução</label>
-                    <textarea value={instrucoes} onChange={e => setInstrucoes(e.target.value)} rows={3} />
-                  </div>
-
-                  {erro && <span className={styles.erro}>{erro}</span>}
-
-                  <div className={styles.modalActions}>
-                    <button type="button" onClick={() => setIsModalOpen(false)} className={styles.cancelBtn}>Cancelar</button>
-                    <button type="submit" className={styles.saveBtn}>Salvar</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-        )}
+        <select 
+          value={statusFiltro} 
+          onChange={(e) => setStatusFiltro(e.target.value)}
+          style={{ padding: '0.7rem', borderRadius: '6px', border: '1px solid #cbd5e1', color: '#475569', minWidth: '130px' }}
+        >
+          <option value="todos">Todos Status</option>
+          <option value="ativos">Apenas Ativos</option>
+          <option value="inativos">Apenas Inativos</option>
+        </select>
       </div>
+
+      <div className={styles.list}>
+        {loading && <p>Carregando...</p>}
+        {!loading && exercicios.length === 0 && <p className={styles.empty}>Nenhum exercício encontrado com esses filtros.</p>}
+
+        {exercicios.map(ex => (
+          <div key={ex.id} className={styles.card}>
+            <div className={styles.info}>
+              <h3>{ex.nome}</h3>
+              <p>{ex.grupoMuscular || 'Grupo não informado'} • {ex.ativo ? 'Ativo' : 'Inativo'}</p>
+            </div>
+            <div className={styles.actions}>
+              <button onClick={() => toggleStatus(ex)} title={ex.ativo ? 'Desativar' : 'Reativar'}>
+                {ex.ativo ? '🚫' : '✅'}
+              </button>
+              <button onClick={() => abrirModalEditar(ex)} title="Editar">✏️</button>
+              <button onClick={() => deletarExercicio(ex)} title="Excluir Definitivamente" style={{ color: '#dc2626' }}>🗑️</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {isModalOpen && (
+        <div className={styles.overlay} onClick={() => setIsModalOpen(false)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <h2>{exercicioEditando ? 'Editar Exercício' : 'Novo Exercício'}</h2>
+            <form onSubmit={handleSalvar} className={styles.form}>
+              <div className={styles.field}>
+                <label>Nome do Exercício *</label>
+                <input type="text" value={nome} onChange={e => setNome(e.target.value)} required />
+              </div>
+              
+              <div className={styles.field}>
+                <label>Grupo Muscular</label>
+                <select value={grupo} onChange={e => setGrupo(e.target.value)} style={{ padding: '0.7rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+                  <option value="">Selecione...</option>
+                  {gruposMusculares.map(g => <option key={g} value={g}>{g}</option>)}
+                </select>
+              </div>
+
+              <div className={styles.field}>
+                <label>Descrição</label>
+                <input type="text" value={descricao} onChange={e => setDescricao(e.target.value)} />
+              </div>
+              <div className={styles.field}>
+                <label>Instruções de Execução</label>
+                <textarea value={instrucoes} onChange={e => setInstrucoes(e.target.value)} rows={3} />
+              </div>
+
+              {erro && <span className={styles.erro}>{erro}</span>}
+
+              <div className={styles.modalActions}>
+                <button type="button" onClick={() => setIsModalOpen(false)} className={styles.cancelBtn}>Cancelar</button>
+                <button type="submit" className={styles.saveBtn}>Salvar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

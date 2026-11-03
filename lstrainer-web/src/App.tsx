@@ -4,11 +4,13 @@ import { AuthProvider } from './hooks/useAuth';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
 import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AlunosPage } from './pages/AlunosPage';
 import { AlunoDetailPage } from './pages/AlunoDetailPage';
 import { FichaDetailPage } from './pages/FichaDetailPage';
 import { ExerciciosPage } from './pages/ExerciciosPage';
+import { PerfilPage } from './pages/PerfilPage'; // <-- Importar
 
 export function App() {
   return (
@@ -17,6 +19,7 @@ export function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
@@ -25,10 +28,11 @@ export function App() {
               <Route path="/alunos/:id" element={<AlunoDetailPage />} />
               <Route path="/fichas/:id" element={<FichaDetailPage />} />
               <Route path="/exercicios" element={<ExerciciosPage />} />
+              <Route path="/perfil" element={<PerfilPage />} /> {/* <-- Nova Rota */}
             </Route>
           </Route>
 
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
