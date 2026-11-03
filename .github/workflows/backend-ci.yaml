@@ -21,9 +21,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Dar permissão ao Maven
+      - name: Dar permissão de execução ao Maven
         run: chmod +x mvnw
 
-      - name: Rodar Testes e Build (Backend)
-        # Removemos o working-directory, ele vai rodar na raiz
+      - name: Rodar Testes e Build
         run: ./mvnw clean verify

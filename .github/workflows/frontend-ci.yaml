@@ -18,14 +18,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: './lstrainer-web/package-lock.json'
 
       - name: Instalar dependências
-        working-directory: ./lstrainer-web # O Frontend continua na subpasta
-        run: npm ci
+        working-directory: ./lstrainer-web
+        run: npm install # <-- Mudou de 'npm ci' para 'npm install'
 
-      - name: Rodar testes (Vitest)
+      - name: Rodar testes
         working-directory: ./lstrainer-web
         run: npm test -- --run
 
