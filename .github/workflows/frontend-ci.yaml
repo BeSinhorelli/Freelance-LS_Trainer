@@ -18,14 +18,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: './lstrainer-web/package-lock.json'
 
       - name: Instalar dependências
         working-directory: ./lstrainer-web
-        run: npm install # <-- Mudou de 'npm ci' para 'npm install'
+        run: npm ci
 
-      - name: Rodar testes
+      - name: Rodar testes (Vitest)
         working-directory: ./lstrainer-web
-        run: npm test -- --run
+        run: npm test -- --run # O '--run' é essencial para o CI não travar
 
       - name: Build de produção
         working-directory: ./lstrainer-web

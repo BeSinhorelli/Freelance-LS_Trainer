@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { LoginPage } from './LoginPage';
 import { BrowserRouter } from 'react-router-dom';
 
+// Mock do useAuth para não precisar de um backend real
 vi.mock('../hooks/useAuth', () => ({
   useAuth: () => ({
     login: vi.fn(),
@@ -13,9 +14,9 @@ vi.mock('../hooks/useAuth', () => ({
 describe('LoginPage', () => {
   it('deve renderizar o formulário de login', () => {
     render(
-      <BrowserRouter>
-        <LoginPage />
-      </BrowserRouter>
+        <BrowserRouter>
+          <LoginPage />
+        </BrowserRouter>
     );
 
     expect(screen.getByText('LS Trainer')).toBeInTheDocument();
@@ -25,9 +26,9 @@ describe('LoginPage', () => {
 
   it('deve permitir digitar nos campos', () => {
     render(
-      <BrowserRouter>
-        <LoginPage />
-      </BrowserRouter>
+        <BrowserRouter>
+          <LoginPage />
+        </BrowserRouter>
     );
 
     const emailInput = screen.getByLabelText('E-mail');
