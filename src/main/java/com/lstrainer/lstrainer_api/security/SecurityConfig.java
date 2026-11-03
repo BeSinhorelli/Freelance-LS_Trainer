@@ -47,17 +47,16 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable)
+            .csrf(AbstractHttpConfigurer::disable) // CSRF mitigado via SameSite=Strict + HttpOnly
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
                 .requestMatchers(
-                    "/v3/api-docs/**",
                     "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/error"
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
@@ -75,7 +74,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); 
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

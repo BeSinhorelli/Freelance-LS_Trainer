@@ -19,8 +19,8 @@ public record ExercicioResponse(
                 e.getId(),
                 e.getNome(),
                 e.getGrupoMuscular(),
-                e.getDescricao(),
-                e.getInstrucoes(),
+                e.getDescricao(), // <-- Garantindo que a descrição vá
+                e.getInstrucoes(), // <-- Garantindo que as instruções vão
                 e.getAtivo(),
                 e.getCriadoEm(),
                 e.getAtualizadoEm()
