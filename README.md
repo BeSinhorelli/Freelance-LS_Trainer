@@ -4,13 +4,6 @@
   <em>Sistema de Gestão de Fichas de Treino</em>
 </p>
 <div align="center">
-  
-![Java](https://skillicons.dev/icons?i=java)
-![Spring](https://skillicons.dev/icons?i=spring)
-![PostgreSQL](https://skillicons.dev/icons?i=postgresql)
-![Docker](https://skillicons.dev/icons?i=docker)
-<br>
-![HTML](https://skillicons.dev/icons?i=html) ![CSS](https://skillicons.dev/icons?i=css) ![React](https://skillicons.dev/icons?i=react) ![TypeScript](https://skillicons.dev/icons?i=typescript)
 
 </div>
 
