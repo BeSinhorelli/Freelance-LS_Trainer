@@ -2,9 +2,12 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+
 export function LoginPage() {
-  const [email, setEmail] = useState('admin@lstrainer.com');
-  const [senha, setSenha] = useState('admin123');
+  // ALTERAÇÃO AQUI: Começa vazio em vez de admin@lstrainer.com
+  const [email, setEmail] = useState(''); 
+  // ALTERAÇÃO AQUI: Começa vazio em vez de admin123
+  const [senha, setSenha] = useState(''); 
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
 
@@ -20,7 +23,7 @@ export function LoginPage() {
       await login(email, senha);
       navigate('/dashboard');
     } catch (err) {
-      setErro('E-mail ou senha inválidos. Verifique se o backend está rodando.');
+      setErro('E-mail ou senha inválidos. Verifique seus dados.');
     } finally {
       setCarregando(false);
     }
@@ -43,6 +46,7 @@ export function LoginPage() {
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             required 
+            placeholder="seu@email.com" // <-- Adicionado placeholder
             style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '1rem', color: '#333', backgroundColor: '#fff' }} 
           />
         </div>
@@ -55,6 +59,7 @@ export function LoginPage() {
             value={senha} 
             onChange={(e) => setSenha(e.target.value)} 
             required 
+            placeholder="Sua senha" // <-- Adicionado placeholder
             style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '1rem', color: '#333', backgroundColor: '#fff' }} 
           />
         </div>
@@ -76,7 +81,6 @@ export function LoginPage() {
           </Link>
         </div>
 
-        {/* NOVO LINK DE RECUPERAÇÃO */}
         <div style={{ textAlign: 'center' }}>
           <Link to="/recuperar-senha" style={{ color: '#64748b', fontSize: '0.85rem', textDecoration: 'underline' }}>
             Esqueci minha senha
