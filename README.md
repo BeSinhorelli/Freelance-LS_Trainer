@@ -9,7 +9,8 @@
 ![Spring](https://skillicons.dev/icons?i=spring)
 ![PostgreSQL](https://skillicons.dev/icons?i=postgresql)
 ![Docker](https://skillicons.dev/icons?i=docker)
-![HTML](https://skillicons.dev/icons?i=html) ![CSS](https://skillicons.dev/icons?i=css) <br> ![React](https://skillicons.dev/icons?i=react) ![TypeScript](https://skillicons.dev/icons?i=typescript)
+<br>
+![HTML](https://skillicons.dev/icons?i=html) ![CSS](https://skillicons.dev/icons?i=css) ![React](https://skillicons.dev/icons?i=react) ![TypeScript](https://skillicons.dev/icons?i=typescript)
 
 </div>
 
