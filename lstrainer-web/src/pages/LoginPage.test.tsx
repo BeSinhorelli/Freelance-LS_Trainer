@@ -4,8 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { LoginPage } from './LoginPage';
 import { BrowserRouter } from 'react-router-dom';
 
-// O mock do useAuth NÃO precisa importar a função login do arquivo real,
-// apenas retorna um objeto vazio para o componente não quebrar.
+// Mock sem a variável 'login'
 vi.mock('../hooks/useAuth', () => ({
   useAuth: () => ({}),
 }));

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-
 export function LoginPage() {
   const [email, setEmail] = useState('admin@lstrainer.com');
   const [senha, setSenha] = useState('admin123');
