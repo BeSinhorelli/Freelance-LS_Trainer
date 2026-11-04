@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   test: {
-    globals: true, // <-- OBRIGATÓRIO para o 'expect' funcionar sem imports explícitos
+    globals: true,
     environment: 'jsdom',
     css: true,
   },
