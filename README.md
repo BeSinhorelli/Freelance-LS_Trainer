@@ -36,7 +36,7 @@
 
 | **Back-end** | **Front-end** | **Database** | **DevOps** |
 |:---:|:---:|:---:|:---:|
-| ![Java](https://skillicons.dev/icons?i=java) ![Spring](https://skillicons.dev/icons?i=spring) | ![React](https://skillicons.dev/icons?i=react) ![TypeScript](https://skillicons.dev/icons?i=typescript) ![Vite](https://skillicons.dev/icons?i=vite) | ![PostgreSQL](https://skillicons.dev/icons?i=postgresql) | ![Docker](https://skillicons.dev/icons?i=docker) ![GitHub Actions](https://skillicons.dev/icons?i=githubactions) |
+| ![Java](https://skillicons.dev/icons?i=java) ![Spring](https://skillicons.dev/icons?i=spring) | ![React](https://skillicons.dev/icons?i=react) ![TypeScript](https://skillicons.dev/icons?i=typescript) ![CSS](https://skillicons.dev/icons?i=css) ![Vite](https://skillicons.dev/icons?i=vite) | ![PostgreSQL](https://skillicons.dev/icons?i=postgresql) | ![Docker](https://skillicons.dev/icons?i=docker) ![GitHub Actions](https://skillicons.dev/icons?i=githubactions) |
 
 </div>
 
