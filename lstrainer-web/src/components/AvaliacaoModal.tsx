@@ -1,4 +1,5 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect } from 'react';
+import type { FormEvent } from 'react';
 import { api } from '../api/client';
 import styles from './AvaliacaoModal.module.css';
 
@@ -15,7 +16,7 @@ interface AvaliacaoModalProps {
   onClose: () => void;
   onSuccess: () => void;
   alunoId: string | undefined;
-  avaliacaoParaEditar?: Avaliacao | null; // <-- NOVO
+  avaliacaoParaEditar?: Avaliacao | null;
 }
 
 export function AvaliacaoModal({ isOpen, onClose, onSuccess, alunoId, avaliacaoParaEditar }: AvaliacaoModalProps) {
@@ -77,6 +78,7 @@ export function AvaliacaoModal({ isOpen, onClose, onSuccess, alunoId, avaliacaoP
             <label>Data da Avaliação *</label>
             <input type="date" value={data} onChange={e => setData(e.target.value)} required />
           </div>
+          
           <div className={styles.row}>
             <div className={styles.field}>
               <label>Peso (kg)</label>
@@ -87,11 +89,14 @@ export function AvaliacaoModal({ isOpen, onClose, onSuccess, alunoId, avaliacaoP
               <input type="number" step="0.1" value={altura} onChange={e => setAltura(e.target.value)} placeholder="Ex: 175" />
             </div>
           </div>
+
           <div className={styles.field}>
             <label>Observações</label>
             <textarea value={obs} onChange={e => setObs(e.target.value)} rows={3} />
           </div>
+          
           {erro && <span className={styles.erro}>{erro}</span>}
+          
           <div className={styles.actions}>
             <button type="button" onClick={onClose} className={styles.cancelBtn}>Cancelar</button>
             <button type="submit" className={styles.saveBtn}>Salvar</button>

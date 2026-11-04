@@ -15,7 +15,8 @@
   border-radius: 12px;
   width: 100%;
   max-width: 500px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal h2 {
@@ -33,16 +34,19 @@
 .row {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap; /* Permite que os itens caiam para a próxima linha no celular */
 }
 
 .row > .field {
   flex: 1;
+  min-width: 140px; /* Garante que o campo não fique esmagado no celular */
 }
 
 .field {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  width: 100%;
 }
 
 .field label {
@@ -56,6 +60,8 @@
   border-radius: 6px;
   border: 1px solid #cbd5e1;
   font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .field input:focus {
@@ -90,10 +96,9 @@
   cursor: pointer;
 }
 
-.erro {
-  color: #dc2626;
-  font-size: 0.9rem;
-  background: #fee2e2;
-  padding: 0.5rem;
-  border-radius: 4px;
+@media (max-width: 500px) {
+  .row {
+    flex-direction: column;
+    gap: 1rem;
+  }
 }

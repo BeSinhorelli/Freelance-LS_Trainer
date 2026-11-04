@@ -30,7 +30,6 @@ export function FichaModal({ isOpen, onClose, onSuccess, alunoId, fichaParaEdita
       if (fichaParaEditar) {
         setObjetivo(fichaParaEditar.objetivo || '');
         setDataRevisao(fichaParaEditar.dataRevisao || '');
-        // Se a data vier do banco como "2026-11-10T00:00:00Z", precisamos cortar a parte da hora
         const dataFormatada = fichaParaEditar.proximaReavaliacao 
           ? fichaParaEditar.proximaReavaliacao.split('T')[0] 
           : '';
@@ -86,25 +85,18 @@ export function FichaModal({ isOpen, onClose, onSuccess, alunoId, fichaParaEdita
               value={objetivo} 
               onChange={e => setObjetivo(e.target.value)} 
               required 
+              placeholder="Ex: Hipertrofia, Emagrecimento..."
             />
           </div>
 
           <div className={styles.row}>
             <div className={styles.field}>
               <label>Data de Revisão</label>
-              <input 
-                type="date" 
-                value={dataRevisao} 
-                onChange={e => setDataRevisao(e.target.value)} 
-              />
+              <input type="date" value={dataRevisao} onChange={e => setDataRevisao(e.target.value)} />
             </div>
             <div className={styles.field}>
               <label>Próxima Reavaliação</label>
-              <input 
-                type="date" 
-                value={proximaReavaliacao} 
-                onChange={e => setProximaReavaliacao(e.target.value)} 
-              />
+              <input type="date" value={proximaReavaliacao} onChange={e => setProximaReavaliacao(e.target.value)} />
             </div>
           </div>
 
