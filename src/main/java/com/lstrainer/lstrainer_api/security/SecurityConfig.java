@@ -46,36 +46,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                // Rotas públicas
-                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/recuperar-senha").permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permite o preflight do CORS
-                
-                .requestMatchers(
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/error",
-                    "/favicon.ico",
-                    "/"
-                ).permitAll()
-                
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((req, res, e) ->
-                    res.sendError(401, "Não autenticado"))
-                .accessDeniedHandler((req, res, e) ->
-                    res.sendError(403, "Acesso negado"))
-            );
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // Rotas públicas
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/recuperar-senha").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Preflight do CORS
+
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/error",
+                                "/favicon.ico",
+                                "/"
+                        ).permitAll()
+
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, e) ->
+                                res.sendError(401, "Não autenticado"))
+                        .accessDeniedHandler((req, res, e) ->
+                                res.sendError(403, "Acesso negado"))
+                );
 
         return http.build();
     }
@@ -83,16 +83,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        
-        // Permitindo o localhost (para testes locais) e o domínio da Vercel
+
+        // AQUI ESTÁ A CORREÇÃO: Adicionada a URL exata da Vercel
         config.setAllowedOrigins(List.of(
-            "http://localhost:5173", 
-            "https://freelance-ls-trainer.vercel.app"
+                "http://localhost:5173",
+                "https://freelance-ls-trainer.vercel.app"
         ));
-        
+
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // CRUCIAL: Permite o envio de cookies HttpOnly
+        config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
