@@ -55,7 +55,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/recuperar-senha").permitAll() // <-- NOVO
+                .requestMatchers(HttpMethod.POST, "/api/auth/recuperar-senha").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Permite o preflight do CORS
                 
                 .requestMatchers(
                     "/v3/api-docs/**",
@@ -82,10 +83,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173", "https://freelance-ls-trainer.vercel.app"));
+        
+        // Permitindo o localhost (para testes locais) e o domínio da Vercel
+        config.setAllowedOrigins(List.of(
+            "http://localhost:5173", 
+            "https://freelance-ls-trainer.vercel.app"
+        ));
+        
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(true); // CRUCIAL: Permite o envio de cookies HttpOnly
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
