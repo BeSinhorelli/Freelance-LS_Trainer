@@ -16,7 +16,6 @@
 
 ### 🌐 Acesso ao Projeto
 - 🔗 **Sistema em Produção:** [https://ls-trainer.vercel.app](https://ls-trainer.vercel.app)
-- 📚 **Documentação da API (Swagger):** [https://lstrainer-api.onrender.com/swagger-ui.html](https://lstrainer-api.onrender.com/swagger-ui.html)
 
 ---
 
