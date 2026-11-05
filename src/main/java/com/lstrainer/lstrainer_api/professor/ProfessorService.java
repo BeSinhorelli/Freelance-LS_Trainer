@@ -1,5 +1,6 @@
 package com.lstrainer.lstrainer_api.professor;
 
+import com.lstrainer.lstrainer_api.config.EmailVerificationService;
 import com.lstrainer.lstrainer_api.exception.BusinessException;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.professor.dto.PasswordUpdateRequest;
@@ -17,14 +18,24 @@ public class ProfessorService {
 
     private final ProfessorRepository professorRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService; // INJETADO
 
-    public ProfessorService(ProfessorRepository professorRepository, PasswordEncoder passwordEncoder) {
+    public ProfessorService(ProfessorRepository professorRepository, 
+                            PasswordEncoder passwordEncoder,
+                            EmailVerificationService emailVerificationService) {
         this.professorRepository = professorRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @Transactional
     public ProfessorResponse registrar(RegisterRequest request) {
+        // 1. VALIDA SE O E-MAIL REALMENTE EXISTE
+        if (!emailVerificationService.isEmailReal(request.email())) {
+            throw new BusinessException("Este e-mail não parece ser válido ou não pode receber mensagens. Verifique o endereço digitado.");
+        }
+
+        // 2. Verifica se já existe no banco
         if (professorRepository.findByEmail(request.email()).isPresent()) {
             throw new BusinessException("Já existe um professor com este e-mail.");
         }
@@ -74,14 +85,5 @@ public class ProfessorService {
         }
 
         professor.setSenhaHash(passwordEncoder.encode(request.novaSenha()));
-    }
-
-    // NOVO MÉTODO DE RECUPERAÇÃO DE SENHA
-    @Transactional
-    public void recuperarSenha(String email, String novaSenha) {
-        Professor professor = professorRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Nenhum professor encontrado com este e-mail."));
-        
-        professor.setSenhaHash(passwordEncoder.encode(novaSenha));
     }
 }
