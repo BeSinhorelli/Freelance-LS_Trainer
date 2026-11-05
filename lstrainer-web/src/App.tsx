@@ -5,14 +5,12 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
-import { RecuperarSenhaPage } from './pages/RecuperarSenhaPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AlunosPage } from './pages/AlunosPage';
 import { AlunoDetailPage } from './pages/AlunoDetailPage';
 import { FichaDetailPage } from './pages/FichaDetailPage';
 import { ExerciciosPage } from './pages/ExerciciosPage';
 import { PerfilPage } from './pages/PerfilPage';
-import { VerificarEmailPage } from './pages/VerificarEmailPage'; // <-- IMPORTADO
 
 export function App() {
   return (
@@ -23,8 +21,6 @@ export function App() {
           {/* Rotas Públicas */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
-          <Route path="/verificar-email" element={<VerificarEmailPage />} /> {/* <-- NOVA ROTA */}
           
           {/* Rotas Protegidas */}
           <Route element={<ProtectedRoute />}>

@@ -4,9 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export function LoginPage() {
-  // ALTERAÇÃO AQUI: Começa vazio em vez de admin@lstrainer.com
   const [email, setEmail] = useState(''); 
-  // ALTERAÇÃO AQUI: Começa vazio em vez de admin123
   const [senha, setSenha] = useState(''); 
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
@@ -46,7 +44,7 @@ export function LoginPage() {
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             required 
-            placeholder="seu@email.com" // <-- Adicionado placeholder
+            placeholder="seu@email.com"
             style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '1rem', color: '#333', backgroundColor: '#fff' }} 
           />
         </div>
@@ -59,7 +57,7 @@ export function LoginPage() {
             value={senha} 
             onChange={(e) => setSenha(e.target.value)} 
             required 
-            placeholder="Sua senha" // <-- Adicionado placeholder
+            placeholder="Sua senha"
             style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '1rem', color: '#333', backgroundColor: '#fff' }} 
           />
         </div>
@@ -74,16 +72,26 @@ export function LoginPage() {
           {carregando ? 'Entrando...' : 'Entrar no Sistema'}
         </button>
 
+        {/* DIVISOR */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.5rem 0' }}>
+          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #cbd5e1' }} />
+          <span style={{ color: '#64748b', fontSize: '0.85rem' }}>ou</span>
+          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #cbd5e1' }} />
+        </div>
+
+        {/* BOTÃO GOOGLE */}
+        <a 
+          href="https://lstrainer-api.onrender.com/oauth2/authorization/google"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: '#fff', border: '1px solid #cbd5e1', padding: '0.8rem', borderRadius: '6px', textDecoration: 'none', color: '#333', fontWeight: 'bold', transition: 'background 0.2s' }}
+        >
+          <img src="https://www.google.com/favicon.ico" alt="Google" width="20" />
+          Entrar com Google
+        </a>
+
         <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
           <span style={{ color: '#64748b', fontSize: '0.9rem' }}>Não tem uma conta? </span>
           <Link to="/register" style={{ color: '#1e40af', fontWeight: 'bold', fontSize: '0.9rem', textDecoration: 'none' }}>
             Cadastre-se
-          </Link>
-        </div>
-
-        <div style={{ textAlign: 'center' }}>
-          <Link to="/recuperar-senha" style={{ color: '#64748b', fontSize: '0.85rem', textDecoration: 'underline' }}>
-            Esqueci minha senha
           </Link>
         </div>
       </form>

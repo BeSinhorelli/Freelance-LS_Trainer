@@ -10,8 +10,17 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
 
-# Limites de tamanho para evitar DoS
 server:
   tomcat:
     max-http-form-post-size: 2MB
@@ -25,13 +34,4 @@ app:
     cookie-name: AUTH_TOKEN
     cookie-secure: true
     cookie-same-site: None
-
-  # Configuração do BounceZero (Validação de Existência)
-  email-verification:
-    api-key: ${APP_EMAIL_VERIFICATION_API_KEY:}
-
-  # Configuração da Resend (Envio de E-mail)
-  email:
-    api-key: ${EMAIL_API_KEY:}
-    from: ${EMAIL_FROM:onboarding@resend.dev}
-    frontend-url: https://ls-trainer.vercel.app
+  frontend-url: https://ls-trainer.vercel.app

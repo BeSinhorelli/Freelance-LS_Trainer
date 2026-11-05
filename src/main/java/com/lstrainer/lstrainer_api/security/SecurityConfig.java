@@ -24,11 +24,14 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ProfessorUserDetailsService userDetailsService;
+    private final OAuth2SuccessHandler oauth2SuccessHandler;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          ProfessorUserDetailsService userDetailsService) {
+                          ProfessorUserDetailsService userDetailsService,
+                          OAuth2SuccessHandler oauth2SuccessHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
+        this.oauth2SuccessHandler = oauth2SuccessHandler;
     }
 
     @Bean
@@ -48,33 +51,24 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // OAuth2 precisa de sessão temporária para o redirect
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
-                // Rotas públicas
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/auth/verificar-email").permitAll() // NOVO AQUI
-                
-                // Rotas de documentação e erro
+                .requestMatchers("/login/**", "/oauth2/**").permitAll()
                 .requestMatchers(
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/error",
-                    "/favicon.ico",
-                    "/"
+                    "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/error", "/favicon.ico", "/"
                 ).permitAll()
-                
-                // Qualquer outra rota exige autenticação
                 .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler(oauth2SuccessHandler)
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((req, res, e) ->
-                    res.sendError(401, "Não autenticado"))
-                .accessDeniedHandler((req, res, e) ->
-                    res.sendError(403, "Acesso negado"))
+                .authenticationEntryPoint((req, res, e) -> res.sendError(401, "Não autenticado"))
+                .accessDeniedHandler((req, res, e) -> res.sendError(403, "Acesso negado"))
             );
 
         return http.build();
@@ -83,10 +77,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-            "http://localhost:5173",
-            "https://ls-trainer.vercel.app"
-        ));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "https://ls-trainer.vercel.app"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
