@@ -7,8 +7,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProfessorRepository extends JpaRepository<Professor, Long> {
-
     Optional<Professor> findByEmail(String email);
-
     boolean existsByEmail(String email);
+    Optional<Professor> findByVerificationToken(String token); // NOVO
 }

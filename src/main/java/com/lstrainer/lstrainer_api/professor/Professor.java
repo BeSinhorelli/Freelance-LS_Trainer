@@ -1,16 +1,7 @@
 package com.lstrainer.lstrainer_api.professor;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -40,6 +31,16 @@ public class Professor {
 
     @Column(nullable = false)
     private Boolean ativo;
+
+    // NOVOS CAMPOS DE VERIFICAÇÃO
+    @Column(name = "email_verificado", nullable = false)
+    private Boolean emailVerificado;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
+    @Column(name = "token_expira_em")
+    private Instant tokenExpiraEm;
 
     @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)

@@ -16,13 +16,8 @@ public class ProfessorUserDetails implements UserDetails {
         this.professor = professor;
     }
 
-    public Long getProfessorId() {
-        return professor.getId();
-    }
-
-    public String getNome() {
-        return professor.getNome();
-    }
+    public Long getProfessorId() { return professor.getId(); }
+    public String getNome() { return professor.getNome(); }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -30,24 +25,22 @@ public class ProfessorUserDetails implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
-        return professor.getSenhaHash();
-    }
+    public String getPassword() { return professor.getSenhaHash(); }
 
     @Override
-    public String getUsername() {
-        return professor.getEmail();
-    }
+    public String getUsername() { return professor.getEmail(); }
 
     @Override
     public boolean isAccountNonExpired() { return true; }
-
     @Override
     public boolean isAccountNonLocked() { return true; }
-
     @Override
     public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() { return Boolean.TRUE.equals(professor.getAtivo()); }
+    public boolean isEnabled() {
+        // Só está habilitado se estiver ativo E com e-mail verificado
+        return Boolean.TRUE.equals(professor.getAtivo()) 
+                && Boolean.TRUE.equals(professor.getEmailVerificado());
+    }
 }
