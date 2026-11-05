@@ -18,15 +18,14 @@ public class EmailVerificationService {
         this.restClient = builder
                 .baseUrl("https://api.bouncezero.io/api/v1")
                 .defaultHeader("X-API-Key", apiKey)
+                .defaultHeader("User-Agent", "LSTrainer/1.0") // OBRIGATÓRIO PELA BOUNCEZERO
                 .build();
     }
 
     public boolean isEmailReal(String email) {
-        // Se a chave não estiver configurada (ex: ambiente local), permite o cadastro.
-        // Em produção, a chave deve existir.
         if (apiKey == null || apiKey.isBlank()) {
             System.out.println("⚠️ Chave de API de verificação não configurada. Pulando verificação.");
-            return true; 
+            return true;
         }
 
         try {
@@ -42,19 +41,17 @@ public class EmailVerificationService {
                 return "valid".equals(result.classification()) && !result.disposable();
             }
         } catch (Exception e) {
-            // Se a API falhar (rede, timeout, limite), NÃO bloqueamos o usuário.
-            // Isso evita que um problema na API externa derrube o seu cadastro.
-            System.err.println("Erro ao verificar e-mail: " + e.getMessage());
-            return true; 
+            // MUDADO PARA FALSE: Se a API falhar, bloqueia o cadastro e loga o erro real
+            System.err.println("❌ ERRO NA API DO BOUNCEZERO: " + e.getMessage());
+            return false;
         }
         return false;
     }
 
-    // DTO para mapear a resposta da API da BounceZero
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record VerifyResult(
-            String classification, // "valid" ou "invalid"
+            String classification,
             @JsonProperty("is_deliverable") boolean isDeliverable,
-            boolean disposable    // true se for e-mail temporário
+            boolean disposable
     ) {}
 }
