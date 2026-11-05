@@ -25,3 +25,6 @@ app:
     cookie-name: AUTH_TOKEN
     cookie-secure: true
     cookie-same-site: None
+  # ADICIONADO AQUI:
+  email-verification:
+    api-key: ${APP_EMAIL_VERIFICATION_API_KEY:}
