@@ -11,7 +11,7 @@ public record AlunoRequest(
 
         LocalDate dataNascimento,
 
-        @Size(max = 100, message = "O contato deve ter no máximo 100 caracteres")
+        @Size(max = 20, message = "O contato deve ter no máximo 20 caracteres") // <-- ALTERADO PARA 20
         String contato,
 
         @Size(max = 30, message = "O nível de experiência deve ter no máximo 30 caracteres")
