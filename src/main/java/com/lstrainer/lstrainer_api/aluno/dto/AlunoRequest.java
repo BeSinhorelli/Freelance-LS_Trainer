@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 public record AlunoRequest(
         @NotBlank(message = "O nome é obrigatório")
-        @Size(max = 150, message = "O nome deve ter no máximo 150 caracteres")
+        @Size(max = 50, message = "O nome deve ter no máximo 50 caracteres")
         String nome,
 
         LocalDate dataNascimento,
