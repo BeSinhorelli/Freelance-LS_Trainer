@@ -69,11 +69,4 @@ public class AuthController {
     public ResponseEntity<ProfessorResponse> me(@AuthenticationPrincipal ProfessorUserDetails userDetails) {
         return ResponseEntity.ok(professorService.findById(userDetails.getProfessorId()));
     }
-
-    // NOVO ENDPOINT DE VERIFICAÇÃO
-    @GetMapping("/verificar-email")
-    public ResponseEntity<String> verificarEmail(@RequestParam String token) {
-        professorService.verificarEmail(token);
-        return ResponseEntity.ok("E-mail verificado com sucesso! Você já pode fazer login.");
-    }
 }
