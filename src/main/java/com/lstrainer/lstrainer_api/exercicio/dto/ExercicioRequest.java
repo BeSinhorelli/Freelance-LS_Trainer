@@ -11,6 +11,9 @@ public record ExercicioRequest(
         @Size(max = 50, message = "O grupo muscular deve ter no máximo 50 caracteres")
         String grupoMuscular,
 
+        @Size(max = 1000, message = "A descrição deve ter no máximo 1000 caracteres")
         String descricao,
+
+        @Size(max = 1000, message = "As instruções devem ter no máximo 1000 caracteres")
         String instrucoes
 ) {}

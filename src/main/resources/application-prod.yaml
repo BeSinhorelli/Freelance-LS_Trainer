@@ -7,15 +7,21 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
-    show-sql: false
   flyway:
     enabled: true
     baseline-on-migrate: true
+
+# Limites de tamanho para evitar DoS
+server:
+  tomcat:
+    max-http-form-post-size: 2MB
+    max-swallow-size: 2MB
+  max-http-request-header-size: 16KB
 
 app:
   jwt:
     secret: ${APP_JWT_SECRET}
     expiration-ms: 28800000
     cookie-name: AUTH_TOKEN
-    cookie-secure: true       # Exige HTTPS
-    cookie-same-site: None    # Permite o envio entre Vercel e Render
+    cookie-secure: true
+    cookie-same-site: None
