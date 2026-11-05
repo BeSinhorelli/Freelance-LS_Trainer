@@ -30,14 +30,10 @@ export function FichaModal({ isOpen, onClose, onSuccess, alunoId, fichaParaEdita
       if (fichaParaEditar) {
         setObjetivo(fichaParaEditar.objetivo || '');
         setDataRevisao(fichaParaEditar.dataRevisao || '');
-        const dataFormatada = fichaParaEditar.proximaReavaliacao 
-          ? fichaParaEditar.proximaReavaliacao.split('T')[0] 
-          : '';
+        const dataFormatada = fichaParaEditar.proximaReavaliacao ? fichaParaEditar.proximaReavaliacao.split('T')[0] : '';
         setProximaReavaliacao(dataFormatada);
       } else {
-        setObjetivo('');
-        setDataRevisao('');
-        setProximaReavaliacao('');
+        setObjetivo(''); setDataRevisao(''); setProximaReavaliacao('');
       }
     }
   }, [isOpen, fichaParaEditar]);
@@ -76,19 +72,11 @@ export function FichaModal({ isOpen, onClose, onSuccess, alunoId, fichaParaEdita
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <h2>{fichaParaEditar ? 'Editar Ficha' : 'Nova Ficha'}</h2>
-        
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
             <label>Objetivo do Treino *</label>
-            <input 
-              type="text" 
-              value={objetivo} 
-              onChange={e => setObjetivo(e.target.value)} 
-              required 
-              placeholder="Ex: Hipertrofia, Emagrecimento..."
-            />
+            <input type="text" value={objetivo} onChange={e => setObjetivo(e.target.value)} required maxLength={255} />
           </div>
-
           <div className={styles.row}>
             <div className={styles.field}>
               <label>Data de Revisão</label>
@@ -99,12 +87,9 @@ export function FichaModal({ isOpen, onClose, onSuccess, alunoId, fichaParaEdita
               <input type="date" value={proximaReavaliacao} onChange={e => setProximaReavaliacao(e.target.value)} />
             </div>
           </div>
-
           <div className={styles.actions}>
             <button type="button" onClick={onClose} className={styles.cancelBtn} disabled={carregando}>Cancelar</button>
-            <button type="submit" className={styles.saveBtn} disabled={carregando}>
-              {carregando ? 'Salvando...' : 'Salvar'}
-            </button>
+            <button type="submit" className={styles.saveBtn} disabled={carregando}>{carregando ? 'Salvando...' : 'Salvar'}</button>
           </div>
         </form>
       </div>

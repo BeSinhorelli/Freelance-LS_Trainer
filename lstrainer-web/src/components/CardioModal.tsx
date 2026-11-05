@@ -1,6 +1,7 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect } from 'react';
+import type { FormEvent } from 'react';
 import { api } from '../api/client';
-import styles from './AvaliacaoModal.module.css';
+import styles from './AvaliacaoModal.module.css'; // Reutilizando o CSS
 
 interface Cardio {
   id: number;
@@ -15,7 +16,7 @@ interface CardioModalProps {
   onClose: () => void;
   onSuccess: () => void;
   alunoId: string | undefined;
-  cardioParaEditar?: Cardio | null; // <-- NOVO
+  cardioParaEditar?: Cardio | null;
 }
 
 export function CardioModal({ isOpen, onClose, onSuccess, alunoId, cardioParaEditar }: CardioModalProps) {
@@ -33,10 +34,7 @@ export function CardioModal({ isOpen, onClose, onSuccess, alunoId, cardioParaEdi
         setFrequencia(cardioParaEditar.frequenciaSemanal?.toString() || '');
         setObs(cardioParaEditar.observacoes || '');
       } else {
-        setModalidade('');
-        setDuracao('');
-        setFrequencia('');
-        setObs('');
+        setModalidade(''); setDuracao(''); setFrequencia(''); setObs('');
       }
       setErro('');
     }
@@ -55,7 +53,6 @@ export function CardioModal({ isOpen, onClose, onSuccess, alunoId, cardioParaEdi
         frequenciaSemanal: frequencia ? Number(frequencia) : null,
         observacoes: obs || null
       };
-
       if (cardioParaEditar) {
         await api.put(`/cardio/${cardioParaEditar.id}`, payload);
       } else {
@@ -75,21 +72,21 @@ export function CardioModal({ isOpen, onClose, onSuccess, alunoId, cardioParaEdi
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
             <label>Modalidade *</label>
-            <input type="text" value={modalidade} onChange={e => setModalidade(e.target.value)} placeholder="Ex: Esteira, Bike, Elíptico" required />
+            <input type="text" value={modalidade} onChange={e => setModalidade(e.target.value)} required maxLength={100} />
           </div>
           <div className={styles.row}>
             <div className={styles.field}>
-              <label>Duração (minutos)</label>
+              <label>Duração (min)</label>
               <input type="number" value={duracao} onChange={e => setDuracao(e.target.value)} />
             </div>
             <div className={styles.field}>
-              <label>Frequência (dias/semana)</label>
+              <label>Frequência (x/sem)</label>
               <input type="number" min="1" max="7" value={frequencia} onChange={e => setFrequencia(e.target.value)} />
             </div>
           </div>
           <div className={styles.field}>
             <label>Observações</label>
-            <textarea value={obs} onChange={e => setObs(e.target.value)} rows={3} />
+            <textarea value={obs} onChange={e => setObs(e.target.value)} rows={3} maxLength={1000} />
           </div>
           {erro && <span className={styles.erro}>{erro}</span>}
           <div className={styles.actions}>

@@ -1,5 +1,6 @@
 package com.lstrainer.lstrainer_api.ficha;
 
+import com.lstrainer.lstrainer_api.config.SanitizationService;
 import com.lstrainer.lstrainer_api.exception.BusinessException;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.exercicio.Exercicio;
@@ -17,18 +18,20 @@ public class ItemFichaService {
     private final ItemFichaTreinoRepository itemRepository;
     private final FichaTreinoRepository fichaRepository;
     private final ExercicioRepository exercicioRepository;
+    private final SanitizationService sanitizer; // INJETADO
 
     public ItemFichaService(ItemFichaTreinoRepository itemRepository,
                             FichaTreinoRepository fichaRepository,
-                            ExercicioRepository exercicioRepository) {
+                            ExercicioRepository exercicioRepository,
+                            SanitizationService sanitizer) {
         this.itemRepository = itemRepository;
         this.fichaRepository = fichaRepository;
         this.exercicioRepository = exercicioRepository;
+        this.sanitizer = sanitizer;
     }
 
     @Transactional(readOnly = true)
     public List<ItemFichaResponse> listarPorFicha(Long fichaId, Long professorId) {
-        // Valida se a ficha pertence ao professor
         fichaRepository.findByIdAndProfessorId(fichaId, professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ficha", fichaId));
 
@@ -46,7 +49,6 @@ public class ItemFichaService {
         Exercicio exercicio = exercicioRepository.findByIdAndProfessorId(request.exercicioId(), professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Exercício", request.exercicioId()));
 
-        // Regra: um exercício não pode aparecer duas vezes na mesma ficha
         boolean jaExiste = itemRepository.findByFichaIdOrderByOrdemAsc(fichaId)
                 .stream()
                 .anyMatch(i -> i.getExercicio().getId().equals(exercicio.getId()));
@@ -59,10 +61,10 @@ public class ItemFichaService {
                 .exercicio(exercicio)
                 .ordem(request.ordem())
                 .series(request.series())
-                .repeticoes(request.repeticoes())
-                .carga(request.carga())
+                .repeticoes(sanitizer.clean(request.repeticoes()))
+                .carga(sanitizer.clean(request.carga()))
                 .descansoSegundos(request.descansoSegundos())
-                .observacoes(request.observacoes())
+                .observacoes(sanitizer.clean(request.observacoes()))
                 .build();
 
         return ItemFichaResponse.from(itemRepository.save(item));
@@ -73,7 +75,6 @@ public class ItemFichaService {
         ItemFichaTreino item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Item da Ficha", itemId));
 
-        // Valida se a ficha do item pertence ao professor
         if (!item.getFicha().getProfessor().getId().equals(professorId)) {
             throw new ResourceNotFoundException("Item da Ficha", itemId);
         }

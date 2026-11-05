@@ -143,6 +143,7 @@ export function ExerciciosPage() {
             placeholder="Pesquisar por nome..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
+            maxLength={150} // LIMITE DE CARACTERES NA BUSCA
             style={{ width: '100%', padding: '0.7rem 1rem 0.7rem 2.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
           />
         </div>
@@ -195,12 +196,22 @@ export function ExerciciosPage() {
             <form onSubmit={handleSalvar} className={styles.form}>
               <div className={styles.field}>
                 <label>Nome do Exercício *</label>
-                <input type="text" value={nome} onChange={e => setNome(e.target.value)} required />
+                <input 
+                  type="text" 
+                  value={nome} 
+                  onChange={e => setNome(e.target.value)} 
+                  required 
+                  maxLength={150} // LIMITE DE CARACTERES
+                />
               </div>
               
               <div className={styles.field}>
                 <label>Grupo Muscular</label>
-                <select value={grupo} onChange={e => setGrupo(e.target.value)} style={{ padding: '0.7rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+                <select 
+                  value={grupo} 
+                  onChange={e => setGrupo(e.target.value)} 
+                  style={{ padding: '0.7rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                >
                   <option value="">Selecione...</option>
                   {gruposMusculares.map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
@@ -208,11 +219,21 @@ export function ExerciciosPage() {
 
               <div className={styles.field}>
                 <label>Descrição</label>
-                <input type="text" value={descricao} onChange={e => setDescricao(e.target.value)} />
+                <input 
+                  type="text" 
+                  value={descricao} 
+                  onChange={e => setDescricao(e.target.value)} 
+                  maxLength={1000} // LIMITE DE CARACTERES
+                />
               </div>
               <div className={styles.field}>
                 <label>Instruções de Execução</label>
-                <textarea value={instrucoes} onChange={e => setInstrucoes(e.target.value)} rows={3} />
+                <textarea 
+                  value={instrucoes} 
+                  onChange={e => setInstrucoes(e.target.value)} 
+                  rows={3} 
+                  maxLength={1000} // LIMITE DE CARACTERES
+                />
               </div>
 
               {erro && <span className={styles.erro}>{erro}</span>}

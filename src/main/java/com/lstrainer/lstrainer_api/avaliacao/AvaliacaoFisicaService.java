@@ -4,6 +4,7 @@ import com.lstrainer.lstrainer_api.aluno.Aluno;
 import com.lstrainer.lstrainer_api.aluno.AlunoRepository;
 import com.lstrainer.lstrainer_api.avaliacao.dto.AvaliacaoFisicaRequest;
 import com.lstrainer.lstrainer_api.avaliacao.dto.AvaliacaoFisicaResponse;
+import com.lstrainer.lstrainer_api.config.SanitizationService;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.professor.Professor;
 import com.lstrainer.lstrainer_api.professor.ProfessorRepository;
@@ -18,13 +19,16 @@ public class AvaliacaoFisicaService {
     private final AvaliacaoFisicaRepository avaliacaoRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
+    private final SanitizationService sanitizer; // INJETADO
 
     public AvaliacaoFisicaService(AvaliacaoFisicaRepository avaliacaoRepository, 
                                   AlunoRepository alunoRepository, 
-                                  ProfessorRepository professorRepository) {
+                                  ProfessorRepository professorRepository,
+                                  SanitizationService sanitizer) {
         this.avaliacaoRepository = avaliacaoRepository;
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;
+        this.sanitizer = sanitizer;
     }
 
     @Transactional(readOnly = true)
@@ -42,7 +46,8 @@ public class AvaliacaoFisicaService {
 
         AvaliacaoFisica avaliacao = AvaliacaoFisica.builder()
                 .aluno(aluno).professor(professor).data(request.data())
-                .pesoKg(request.pesoKg()).alturaCm(request.alturaCm()).observacoes(request.observacoes())
+                .pesoKg(request.pesoKg()).alturaCm(request.alturaCm())
+                .observacoes(sanitizer.clean(request.observacoes()))
                 .build();
         return AvaliacaoFisicaResponse.from(avaliacaoRepository.save(avaliacao));
     }
@@ -52,7 +57,6 @@ public class AvaliacaoFisicaService {
         AvaliacaoFisica avaliacao = avaliacaoRepository.findByIdAndProfessorId(id, professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Avaliação", id));
 
-        // Se mudou o aluno, valida se o novo aluno pertence ao professor
         if (!avaliacao.getAluno().getId().equals(request.alunoId())) {
             Aluno novoAluno = alunoRepository.findByIdAndProfessorId(request.alunoId(), professorId)
                     .orElseThrow(() -> new ResourceNotFoundException("Aluno", request.alunoId()));
@@ -62,7 +66,7 @@ public class AvaliacaoFisicaService {
         avaliacao.setData(request.data());
         avaliacao.setPesoKg(request.pesoKg());
         avaliacao.setAlturaCm(request.alturaCm());
-        avaliacao.setObservacoes(request.observacoes());
+        avaliacao.setObservacoes(sanitizer.clean(request.observacoes()));
 
         return AvaliacaoFisicaResponse.from(avaliacao);
     }

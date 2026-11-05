@@ -4,6 +4,7 @@ import com.lstrainer.lstrainer_api.agenda.dto.AgendaTreinoRequest;
 import com.lstrainer.lstrainer_api.agenda.dto.AgendaTreinoResponse;
 import com.lstrainer.lstrainer_api.aluno.Aluno;
 import com.lstrainer.lstrainer_api.aluno.AlunoRepository;
+import com.lstrainer.lstrainer_api.config.SanitizationService;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.ficha.FichaTreino;
 import com.lstrainer.lstrainer_api.ficha.FichaTreinoRepository;
@@ -19,12 +20,18 @@ public class AgendaTreinoService {
     private final AlunoRepository alunoRepository;
     private final FichaTreinoRepository fichaRepository;
     private final ProfessorRepository professorRepository;
+    private final SanitizationService sanitizer; // INJETADO
 
-    public AgendaTreinoService(AgendaTreinoRepository agendaRepository, AlunoRepository alunoRepository, FichaTreinoRepository fichaRepository, ProfessorRepository professorRepository) {
+    public AgendaTreinoService(AgendaTreinoRepository agendaRepository, 
+                               AlunoRepository alunoRepository, 
+                               FichaTreinoRepository fichaRepository, 
+                               ProfessorRepository professorRepository,
+                               SanitizationService sanitizer) {
         this.agendaRepository = agendaRepository;
         this.alunoRepository = alunoRepository;
         this.fichaRepository = fichaRepository;
         this.professorRepository = professorRepository;
+        this.sanitizer = sanitizer;
     }
 
     @Transactional(readOnly = true)
@@ -48,7 +55,9 @@ public class AgendaTreinoService {
 
         AgendaTreino agenda = AgendaTreino.builder()
                 .aluno(aluno).professor(professor).ficha(ficha)
-                .data(request.data()).diaSemana(request.diaSemana()).observacoes(request.observacoes())
+                .data(request.data())
+                .diaSemana(sanitizer.clean(request.diaSemana()))
+                .observacoes(sanitizer.clean(request.observacoes()))
                 .build();
         return AgendaTreinoResponse.from(agendaRepository.save(agenda));
     }

@@ -5,6 +5,7 @@ import com.lstrainer.lstrainer_api.aluno.dto.AlunoRequest;
 import com.lstrainer.lstrainer_api.aluno.dto.AlunoResponse;
 import com.lstrainer.lstrainer_api.avaliacao.AvaliacaoFisicaRepository;
 import com.lstrainer.lstrainer_api.cardio.PrescricaoCardioRepository;
+import com.lstrainer.lstrainer_api.config.SanitizationService;
 import com.lstrainer.lstrainer_api.exception.BusinessException;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.ficha.FichaTreino;
@@ -29,6 +30,7 @@ public class AlunoService {
     private final AvaliacaoFisicaRepository avaliacaoFisicaRepository;
     private final PrescricaoCardioRepository prescricaoCardioRepository;
     private final AgendaTreinoRepository agendaTreinoRepository;
+    private final SanitizationService sanitizer; // <-- INJETADO AQUI
 
     public AlunoService(AlunoRepository alunoRepository,
                         ProfessorRepository professorRepository,
@@ -36,7 +38,8 @@ public class AlunoService {
                         ItemFichaTreinoRepository itemFichaTreinoRepository,
                         AvaliacaoFisicaRepository avaliacaoFisicaRepository,
                         PrescricaoCardioRepository prescricaoCardioRepository,
-                        AgendaTreinoRepository agendaTreinoRepository) {
+                        AgendaTreinoRepository agendaTreinoRepository,
+                        SanitizationService sanitizer) {
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;
         this.fichaTreinoRepository = fichaTreinoRepository;
@@ -44,6 +47,7 @@ public class AlunoService {
         this.avaliacaoFisicaRepository = avaliacaoFisicaRepository;
         this.prescricaoCardioRepository = prescricaoCardioRepository;
         this.agendaTreinoRepository = agendaTreinoRepository;
+        this.sanitizer = sanitizer;
     }
 
     @Transactional(readOnly = true)
@@ -66,11 +70,11 @@ public class AlunoService {
 
         Aluno aluno = Aluno.builder()
                 .professor(professor)
-                .nome(request.nome())
+                .nome(sanitizer.clean(request.nome())) // <-- LIMPEZA XSS
                 .dataNascimento(request.dataNascimento())
-                .contato(request.contato())
+                .contato(sanitizer.clean(request.contato())) // <-- LIMPEZA XSS
                 .nivelExperiencia(request.nivelExperiencia())
-                .observacoes(request.observacoes())
+                .observacoes(sanitizer.clean(request.observacoes())) // <-- LIMPEZA XSS
                 .ativo(true)
                 .build();
 
@@ -81,11 +85,11 @@ public class AlunoService {
     public AlunoResponse atualizar(Long id, AlunoRequest request, Long professorId) {
         Aluno aluno = findAlunoByIdAndProfessor(id, professorId);
 
-        aluno.setNome(request.nome());
+        aluno.setNome(sanitizer.clean(request.nome()));
         aluno.setDataNascimento(request.dataNascimento());
-        aluno.setContato(request.contato());
+        aluno.setContato(sanitizer.clean(request.contato()));
         aluno.setNivelExperiencia(request.nivelExperiencia());
-        aluno.setObservacoes(request.observacoes());
+        aluno.setObservacoes(sanitizer.clean(request.observacoes()));
 
         return AlunoResponse.from(aluno);
     }
@@ -112,23 +116,16 @@ public class AlunoService {
     public void deletar(Long id, Long professorId) {
         Aluno aluno = findAlunoByIdAndProfessor(id, professorId);
 
-        // 1. Apagar itens das fichas e as próprias fichas
         List<FichaTreino> fichas = fichaTreinoRepository.findByAlunoIdAndProfessorId(id, professorId, Pageable.unpaged()).getContent();
         for (FichaTreino ficha : fichas) {
             itemFichaTreinoRepository.deleteByFichaId(ficha.getId());
         }
         fichaTreinoRepository.deleteAll(fichas);
 
-        // 2. Apagar avaliações físicas
         avaliacaoFisicaRepository.deleteAll(avaliacaoFisicaRepository.findByAlunoIdAndProfessorIdOrderByDataDesc(id, professorId));
-
-        // 3. Apagar prescrições de cardio
         prescricaoCardioRepository.deleteAll(prescricaoCardioRepository.findByAlunoIdAndProfessorId(id, professorId));
-
-        // 4. Apagar a agenda
         agendaTreinoRepository.deleteAll(agendaTreinoRepository.findByAlunoIdAndProfessorId(id, professorId));
 
-        // 5. Finalmente, apagar o aluno
         alunoRepository.delete(aluno);
     }
 

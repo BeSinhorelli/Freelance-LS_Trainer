@@ -4,6 +4,7 @@ import com.lstrainer.lstrainer_api.aluno.Aluno;
 import com.lstrainer.lstrainer_api.aluno.AlunoRepository;
 import com.lstrainer.lstrainer_api.cardio.dto.PrescricaoCardioRequest;
 import com.lstrainer.lstrainer_api.cardio.dto.PrescricaoCardioResponse;
+import com.lstrainer.lstrainer_api.config.SanitizationService;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.professor.Professor;
 import com.lstrainer.lstrainer_api.professor.ProfessorRepository;
@@ -18,13 +19,16 @@ public class PrescricaoCardioService {
     private final PrescricaoCardioRepository cardioRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
+    private final SanitizationService sanitizer; // INJETADO
 
     public PrescricaoCardioService(PrescricaoCardioRepository cardioRepository, 
                                    AlunoRepository alunoRepository, 
-                                   ProfessorRepository professorRepository) {
+                                   ProfessorRepository professorRepository,
+                                   SanitizationService sanitizer) {
         this.cardioRepository = cardioRepository;
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;
+        this.sanitizer = sanitizer;
     }
 
     @Transactional(readOnly = true)
@@ -41,8 +45,11 @@ public class PrescricaoCardioService {
                 .orElseThrow(() -> new ResourceNotFoundException("Professor", professorId));
 
         PrescricaoCardio cardio = PrescricaoCardio.builder()
-                .aluno(aluno).professor(professor).modalidade(request.modalidade())
-                .duracaoMinutos(request.duracaoMinutos()).frequenciaSemanal(request.frequenciaSemanal()).observacoes(request.observacoes())
+                .aluno(aluno).professor(professor)
+                .modalidade(sanitizer.clean(request.modalidade()))
+                .duracaoMinutos(request.duracaoMinutos())
+                .frequenciaSemanal(request.frequenciaSemanal())
+                .observacoes(sanitizer.clean(request.observacoes()))
                 .build();
         return PrescricaoCardioResponse.from(cardioRepository.save(cardio));
     }
@@ -58,10 +65,10 @@ public class PrescricaoCardioService {
             cardio.setAluno(novoAluno);
         }
 
-        cardio.setModalidade(request.modalidade());
+        cardio.setModalidade(sanitizer.clean(request.modalidade()));
         cardio.setDuracaoMinutos(request.duracaoMinutos());
         cardio.setFrequenciaSemanal(request.frequenciaSemanal());
-        cardio.setObservacoes(request.observacoes());
+        cardio.setObservacoes(sanitizer.clean(request.observacoes()));
 
         return PrescricaoCardioResponse.from(cardio);
     }

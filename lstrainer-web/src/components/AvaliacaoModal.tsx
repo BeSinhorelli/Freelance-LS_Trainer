@@ -35,9 +35,7 @@ export function AvaliacaoModal({ isOpen, onClose, onSuccess, alunoId, avaliacaoP
         setObs(avaliacaoParaEditar.observacoes || '');
       } else {
         setData(new Date().toISOString().split('T')[0]);
-        setPeso('');
-        setAltura('');
-        setObs('');
+        setPeso(''); setAltura(''); setObs('');
       }
       setErro('');
     }
@@ -56,7 +54,6 @@ export function AvaliacaoModal({ isOpen, onClose, onSuccess, alunoId, avaliacaoP
         alturaCm: altura ? Number(altura) : null,
         observacoes: obs || null
       };
-
       if (avaliacaoParaEditar) {
         await api.put(`/avaliacoes/${avaliacaoParaEditar.id}`, payload);
       } else {
@@ -78,25 +75,21 @@ export function AvaliacaoModal({ isOpen, onClose, onSuccess, alunoId, avaliacaoP
             <label>Data da Avaliação *</label>
             <input type="date" value={data} onChange={e => setData(e.target.value)} required />
           </div>
-          
           <div className={styles.row}>
             <div className={styles.field}>
               <label>Peso (kg)</label>
-              <input type="number" step="0.1" value={peso} onChange={e => setPeso(e.target.value)} placeholder="Ex: 75.5" />
+              <input type="number" step="0.1" value={peso} onChange={e => setPeso(e.target.value)} />
             </div>
             <div className={styles.field}>
               <label>Altura (cm)</label>
-              <input type="number" step="0.1" value={altura} onChange={e => setAltura(e.target.value)} placeholder="Ex: 175" />
+              <input type="number" step="0.1" value={altura} onChange={e => setAltura(e.target.value)} />
             </div>
           </div>
-
           <div className={styles.field}>
             <label>Observações</label>
-            <textarea value={obs} onChange={e => setObs(e.target.value)} rows={3} />
+            <textarea value={obs} onChange={e => setObs(e.target.value)} rows={3} maxLength={1000} />
           </div>
-          
           {erro && <span className={styles.erro}>{erro}</span>}
-          
           <div className={styles.actions}>
             <button type="button" onClick={onClose} className={styles.cancelBtn}>Cancelar</button>
             <button type="submit" className={styles.saveBtn}>Salvar</button>

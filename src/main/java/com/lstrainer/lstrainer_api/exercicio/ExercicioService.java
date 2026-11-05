@@ -1,5 +1,6 @@
 package com.lstrainer.lstrainer_api.exercicio;
 
+import com.lstrainer.lstrainer_api.config.SanitizationService;
 import com.lstrainer.lstrainer_api.exception.BusinessException;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.exercicio.dto.ExercicioRequest;
@@ -18,13 +19,16 @@ public class ExercicioService {
     private final ExercicioRepository exercicioRepository;
     private final ProfessorRepository professorRepository;
     private final ItemFichaTreinoRepository itemFichaTreinoRepository;
+    private final SanitizationService sanitizer; // INJETADO
 
     public ExercicioService(ExercicioRepository exercicioRepository,
                             ProfessorRepository professorRepository,
-                            ItemFichaTreinoRepository itemFichaTreinoRepository) {
+                            ItemFichaTreinoRepository itemFichaTreinoRepository,
+                            SanitizationService sanitizer) {
         this.exercicioRepository = exercicioRepository;
         this.professorRepository = professorRepository;
         this.itemFichaTreinoRepository = itemFichaTreinoRepository;
+        this.sanitizer = sanitizer;
     }
 
     @Transactional(readOnly = true)
@@ -48,10 +52,10 @@ public class ExercicioService {
 
         Exercicio exercicio = Exercicio.builder()
                 .professor(professor)
-                .nome(request.nome())
-                .grupoMuscular(request.grupoMuscular())
-                .descricao(request.descricao())
-                .instrucoes(request.instrucoes())
+                .nome(sanitizer.clean(request.nome()))
+                .grupoMuscular(sanitizer.clean(request.grupoMuscular()))
+                .descricao(sanitizer.clean(request.descricao()))
+                .instrucoes(sanitizer.clean(request.instrucoes()))
                 .ativo(true)
                 .build();
 
@@ -62,10 +66,10 @@ public class ExercicioService {
     public ExercicioResponse atualizar(Long id, ExercicioRequest request, Long professorId) {
         Exercicio exercicio = findExercicioByIdAndProfessor(id, professorId);
 
-        exercicio.setNome(request.nome());
-        exercicio.setGrupoMuscular(request.grupoMuscular());
-        exercicio.setDescricao(request.descricao());
-        exercicio.setInstrucoes(request.instrucoes());
+        exercicio.setNome(sanitizer.clean(request.nome()));
+        exercicio.setGrupoMuscular(sanitizer.clean(request.grupoMuscular()));
+        exercicio.setDescricao(sanitizer.clean(request.descricao()));
+        exercicio.setInstrucoes(sanitizer.clean(request.instrucoes()));
 
         return ExercicioResponse.from(exercicio);
     }
