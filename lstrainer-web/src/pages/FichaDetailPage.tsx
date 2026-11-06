@@ -20,6 +20,14 @@ interface ItemFicha {
   grupoMuscular?: string;
 }
 
+interface FichaTreino {
+  id: number;
+  alunoId: number;
+  objetivo: string;
+  dataRevisao?: string | null;
+  proximaReavaliacao?: string | null;
+}
+
 function SortableItem({
   item,
   onRemove,
@@ -75,6 +83,8 @@ export function FichaDetailPage() {
 
   const [itens, setItens] = useState<ItemFicha[]>([]);
   const [exerciciosDisponiveis, setExerciciosDisponiveis] = useState<any[]>([]);
+  const [ficha, setFicha] = useState<FichaTreino | null>(null);
+  const [nomeTreinoFicha, setNomeTreinoFicha] = useState('');
   const [loading, setLoading] = useState(true);
 
   const [grupoFiltroAdicionar, setGrupoFiltroAdicionar] = useState('');
@@ -102,10 +112,15 @@ export function FichaDetailPage() {
   async function carregarDados() {
     try {
       setLoading(true);
-      const itensRes = await api.get(`/fichas/${id}/itens`);
-      const exRes = await api.get('/exercicios');
+      const [itensRes, exRes, fichaRes] = await Promise.all([
+        api.get(`/fichas/${id}/itens`),
+        api.get('/exercicios'),
+        api.get(`/fichas/${id}`),
+      ]);
       const todosExercicios = exRes.data.content || exRes.data;
       setExerciciosDisponiveis(todosExercicios);
+      setFicha(fichaRes.data);
+      setNomeTreinoFicha(fichaRes.data.objetivo || '');
 
       const itensComGrupo = itensRes.data.map((item: ItemFicha) => {
         const ex = todosExercicios.find((e: any) => e.id === item.exercicioId);
@@ -127,8 +142,25 @@ export function FichaDetailPage() {
     e.preventDefault();
     setErro('');
     if (!exercicioId) { setErro('Selecione um exercício.'); return; }
+    if (!nomeTreinoFicha.trim()) { setErro('Informe o nome do treino.'); return; }
     
     try {
+      if (!ficha) {
+        setErro('Não foi possível carregar os dados da ficha.');
+        return;
+      }
+
+      const nomeAtualizado = nomeTreinoFicha.trim();
+      if (nomeAtualizado !== ficha.objetivo) {
+        await api.put(`/fichas/${id}`, {
+          alunoId: ficha.alunoId,
+          objetivo: nomeAtualizado,
+          dataRevisao: ficha.dataRevisao,
+          proximaReavaliacao: ficha.proximaReavaliacao,
+        });
+        setFicha({ ...ficha, objetivo: nomeAtualizado });
+      }
+
       const itemAtual = itens.find((item) => item.id === itemEditandoId);
       const ordem = itemAtual?.ordem ?? (itens.length > 0 ? Math.max(...itens.map(i => i.ordem)) + 1 : 1);
       const payload = {
@@ -276,6 +308,18 @@ export function FichaDetailPage() {
         <div className={styles.addPanel}>
           <h2>{itemEditandoId !== null ? 'Editar Exercício' : 'Adicionar Exercício'}</h2>
           <form onSubmit={handleAdicionarExercicio} className={styles.form}>
+            <div className={styles.field}>
+              <label htmlFor="nome-treino-ficha">Nome do treino *</label>
+              <input
+                id="nome-treino-ficha"
+                type="text"
+                value={nomeTreinoFicha}
+                onChange={e => setNomeTreinoFicha(e.target.value)}
+                placeholder="Ex.: Treino A — peito e tríceps"
+                maxLength={100}
+                required
+              />
+            </div>
             <div className={styles.field}>
               <label>Filtrar por Grupo</label>
               <select
