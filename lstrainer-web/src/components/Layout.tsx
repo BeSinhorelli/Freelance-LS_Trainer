@@ -19,8 +19,7 @@ export function Layout() {
   const menuItems = [
     { path: '/dashboard', icon: '🏠', label: 'Início' },
     { path: '/alunos', icon: '👥', label: 'Alunos' },
-    { path: '/exercicios', icon: '🏋️', label: 'Exercícios' },
-    { path: '/perfil', icon: '⚙️', label: 'Meu Perfil' },
+    { path: '/exercicios', icon: '🏋️', label: 'Exercícios' }
   ];
 
   return (
