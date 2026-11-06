@@ -20,7 +20,7 @@ export function RegisterPage() {
 
     try {
       await register(nome, email, senha);
-      navigate('/dashboard'); // Vai para o dashboard após cadastrar
+      navigate('/dashboard');
     } catch (err: any) {
       setErro(err.response?.data?.message || 'Erro ao criar conta. Verifique os dados.');
     } finally {
@@ -39,7 +39,7 @@ export function RegisterPage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <label htmlFor="nome" style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#334155' }}>Nome</label>
-          <input id="nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} required style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '1rem' }} />
+          <input id="nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} required maxLength={50} style={{ padding: '0.8rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '1rem' }} />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -57,6 +57,22 @@ export function RegisterPage() {
         <button type="submit" disabled={carregando} style={{ background: '#1e40af', color: 'white', padding: '0.8rem', border: 'none', borderRadius: '6px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', opacity: carregando ? 0.7 : 1, marginTop: '0.5rem' }}>
           {carregando ? 'Criando conta...' : 'Cadastrar'}
         </button>
+
+        {/* DIVISOR */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.5rem 0' }}>
+          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #cbd5e1' }} />
+          <span style={{ color: '#64748b', fontSize: '0.85rem' }}>ou</span>
+          <hr style={{ flex: 1, border: 'none', borderTop: '1px solid #cbd5e1' }} />
+        </div>
+
+        {/* BOTÃO GOOGLE */}
+        <a 
+          href="https://lstrainer-api.onrender.com/oauth2/authorization/google"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: '#fff', border: '1px solid #cbd5e1', padding: '0.8rem', borderRadius: '6px', textDecoration: 'none', color: '#333', fontWeight: 'bold', transition: 'background 0.2s' }}
+        >
+          <img src="https://www.google.com/favicon.ico" alt="Google" width="20" />
+          Cadastrar com Google
+        </a>
 
         <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
           <span style={{ color: '#64748b', fontSize: '0.9rem' }}>Já tem uma conta? </span>

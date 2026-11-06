@@ -9,7 +9,6 @@ interface AuthContextData {
   loading: boolean;
   login: (email: string, senha: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (nome: string, email: string, senha: string) => Promise<void>; // <-- NOVO
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -37,21 +36,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfessor(response.data);
   }
 
-  // NOVA FUNÇÃO: Cadastro
-  async function register(nome: string, email: string, senha: string) {
-    // Faz o cadastro
-    await api.post('/auth/register', { nome, email, senha });
-    // Após cadastrar, faz o login automático
-    await login(email, senha);
-  }
-
   async function logout() {
     await api.post('/auth/logout');
     setProfessor(null);
   }
 
   return (
-    <AuthContext.Provider value={{ professor, isAuthenticated: !!professor, loading, login, logout, register }}>
+    <AuthContext.Provider value={{ professor, isAuthenticated: !!professor, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
