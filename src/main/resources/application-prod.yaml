@@ -21,7 +21,9 @@ spring:
               - email
               - profile
 
+# CONFIGURAÇÃO PARA O RENDER (Proxy Reverso)
 server:
+  forward-headers-strategy: native # Confia no X-Forwarded-For
   tomcat:
     max-http-form-post-size: 2MB
     max-swallow-size: 2MB

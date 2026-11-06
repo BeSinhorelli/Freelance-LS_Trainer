@@ -25,13 +25,16 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ProfessorUserDetailsService userDetailsService;
     private final OAuth2SuccessHandler oauth2SuccessHandler;
+    private final RateLimitFilter rateLimitFilter; // INJETADO
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
                           ProfessorUserDetailsService userDetailsService,
-                          OAuth2SuccessHandler oauth2SuccessHandler) {
+                          OAuth2SuccessHandler oauth2SuccessHandler,
+                          RateLimitFilter rateLimitFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
         this.oauth2SuccessHandler = oauth2SuccessHandler;
+        this.rateLimitFilter = rateLimitFilter;
     }
 
     @Bean
@@ -51,9 +54,10 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            // OAuth2 precisa de sessão temporária para o redirect
+            // OAuth2 precisa de sessão temporária para o redirecionamento
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
+                // Rotas públicas
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                 .requestMatchers("/login/**", "/oauth2/**").permitAll()
@@ -62,9 +66,12 @@ public class SecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
             )
+            // Configura o login com Google
             .oauth2Login(oauth2 -> oauth2
                 .successHandler(oauth2SuccessHandler)
             )
+            // RATE LIMIT: Roda antes do filtro de JWT
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((req, res, e) -> res.sendError(401, "Não autenticado"))
@@ -77,7 +84,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173", "https://ls-trainer.vercel.app"));
+        config.setAllowedOrigins(List.of(
+            "http://localhost:5173",
+            "https://ls-trainer.vercel.app"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
