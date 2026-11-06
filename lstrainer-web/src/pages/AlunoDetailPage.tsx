@@ -4,22 +4,63 @@ import { api } from '../api/client';
 import { FichaModal } from '../components/FichaModal';
 import { AvaliacaoModal } from '../components/AvaliacaoModal';
 import { CardioModal } from '../components/CardioModal';
+import { Calendario } from '../components/Calendario'; // Importando o novo componente
 import styles from './AlunoDetailPage.module.css';
 
-interface Aluno { id: number; nome: string; dataNascimento?: string; contato?: string; nivelExperiencia?: string; observacoes?: string; ativo: boolean; }
-interface FichaTreino { id: number; objetivo: string; status: string; dataCriacao: string; dataRevisao?: string; proximaReavaliacao?: string; }
-interface Avaliacao { id: number; data: string; pesoKg?: number; alturaCm?: number; observacoes?: string; }
-interface Cardio { id: number; modalidade: string; duracaoMinutos?: number; frequenciaSemanal?: number; observacoes?: string; }
+interface Aluno {
+  id: number;
+  nome: string;
+  dataNascimento?: string;
+  contato?: string;
+  nivelExperiencia?: string;
+  observacoes?: string;
+  ativo: boolean;
+}
+
+interface FichaTreino {
+  id: number;
+  objetivo: string;
+  status: string;
+  dataCriacao: string;
+  dataRevisao?: string;
+  proximaReavaliacao?: string;
+}
+
+interface Avaliacao {
+  id: number;
+  data: string;
+  pesoKg?: number;
+  alturaCm?: number;
+  observacoes?: string;
+}
+
+interface Cardio {
+  id: number;
+  modalidade: string;
+  duracaoMinutos?: number;
+  frequenciaSemanal?: number;
+  observacoes?: string;
+}
+
+interface TreinoAgendado {
+  id: number;
+  data: string;
+  nomeTreino: string;
+  itens: any[];
+}
 
 export function AlunoDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  const [abaAtiva, setAbaAtiva] = useState<'fichas' | 'avaliacoes' | 'cardio'>('fichas');
+  // Adicionando 'agenda' nas abas
+  const [abaAtiva, setAbaAtiva] = useState<'fichas' | 'agenda' | 'avaliacoes' | 'cardio'>('fichas');
+
   const [aluno, setAluno] = useState<Aluno | null>(null);
   const [fichas, setFichas] = useState<FichaTreino[]>([]);
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [cardios, setCardios] = useState<Cardio[]>([]);
+  const [treinosAgendados, setTreinosAgendados] = useState<TreinoAgendado[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Modais
@@ -46,8 +87,11 @@ export function AlunoDetailPage() {
 
       const cardRes = await api.get(`/cardio?alunoId=${id}`);
       setCardios(cardRes.data);
+
+      const treinosRes = await api.get(`/treinos-agendados?alunoId=${id}`);
+      setTreinosAgendados(treinosRes.data);
     } catch (error) {
-      console.error('Erro', error);
+      console.error('Erro ao carregar dados', error);
     } finally {
       setLoading(false);
     }
@@ -68,6 +112,16 @@ export function AlunoDetailPage() {
   async function handleRemoverCardio(cardId: number) {
     if (!window.confirm('Apagar este cardio?')) return;
     try { await api.delete(`/cardio/${cardId}`); carregarDados(); } catch (e) { alert('Erro'); }
+  }
+
+  async function handleRemoverTreinoAgendado(treinoId: number) {
+    if (!window.confirm('Apagar este treino agendado?')) return;
+    try {
+      await api.delete(`/treinos-agendados/${treinoId}`);
+      carregarDados();
+    } catch (error) {
+      alert('Erro ao apagar treino.');
+    }
   }
 
   if (loading) return <p>Carregando...</p>;
@@ -93,6 +147,7 @@ export function AlunoDetailPage() {
 
       <div className={styles.tabs}>
         <button className={abaAtiva === 'fichas' ? styles.activeTab : styles.tab} onClick={() => setAbaAtiva('fichas')}>Fichas de Treino</button>
+        <button className={abaAtiva === 'agenda' ? styles.activeTab : styles.tab} onClick={() => setAbaAtiva('agenda')}>Agenda</button>
         <button className={abaAtiva === 'avaliacoes' ? styles.activeTab : styles.tab} onClick={() => setAbaAtiva('avaliacoes')}>Avaliações Físicas</button>
         <button className={abaAtiva === 'cardio' ? styles.activeTab : styles.tab} onClick={() => setAbaAtiva('cardio')}>Cardio</button>
       </div>
@@ -122,6 +177,53 @@ export function AlunoDetailPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* NOVA ABA AGENDA */}
+      {abaAtiva === 'agenda' && (
+        <div className={styles.section} style={{ flexDirection: 'row', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          
+          {/* Coluna do Calendário */}
+          <div style={{ flex: 1, minWidth: '300px' }}>
+            <h2>Calendário de Treinos</h2>
+            <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1rem' }}>
+              Os dias com treinos agendados ficam verdes. Vá em "Fichas" para montar e agendar novos treinos.
+            </p>
+            <Calendario 
+              onSelectDate={(date) => console.log("Data selecionada:", date)} 
+              treinosAgendados={treinosAgendados} 
+            />
+          </div>
+
+          {/* Coluna da Lista de Treinos Agendados */}
+          <div style={{ flex: 1, minWidth: '300px' }}>
+            <div className={styles.sectionHeader}>
+              <h2>Treinos Agendados</h2>
+            </div>
+
+            {treinosAgendados.length === 0 ? (
+              <p className={styles.empty}>Nenhum treino agendado.</p>
+            ) : (
+              <div className={styles.fichasList} style={{ marginTop: '1rem' }}>
+                {treinosAgendados.map((treino) => (
+                  <div key={treino.id} className={styles.fichaCard}>
+                    <div>
+                      <h3>{treino.nomeTreino}</h3>
+                      <p><strong>Data:</strong> {new Date(treino.data).toLocaleDateString('pt-BR')}</p>
+                      <p><strong>Exercícios:</strong> {treino.itens.length} exercícios</p>
+                    </div>
+                    <button 
+                      onClick={() => handleRemoverTreinoAgendado(treino.id)}
+                      style={{ background: '#fee2e2', color: '#dc2626', border: 'none', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer' }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
