@@ -66,6 +66,30 @@ public class ItemFichaService {
         return ItemFichaResponse.from(itemRepository.save(item));
     }
 
+    // NOVO MÉTODO DE ATUALIZAÇÃO (EDIÇÃO)
+    @Transactional
+    public ItemFichaResponse atualizar(Long fichaId, Long itemId, ItemFichaRequest request, Long professorId) {
+        // Valida se a ficha pertence ao professor
+        fichaRepository.findByIdAndProfessorId(fichaId, professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ficha", fichaId));
+
+        ItemFichaTreino item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Item da Ficha", itemId));
+
+        // Valida se o item pertence à ficha informada
+        if (!item.getFicha().getId().equals(fichaId)) {
+            throw new BusinessException("Este item não pertence à ficha informada.");
+        }
+
+        item.setSeries(request.series());
+        item.setRepeticoes(request.repeticoes());
+        item.setCarga(request.carga());
+        item.setDescansoSegundos(request.descansoSegundos());
+        item.setObservacoes(request.observacoes());
+
+        return ItemFichaResponse.from(item);
+    }
+
     @Transactional
     public void remover(Long itemId, Long professorId) {
         ItemFichaTreino item = itemRepository.findById(itemId)
@@ -83,15 +107,16 @@ public class ItemFichaService {
         fichaRepository.findByIdAndProfessorId(fichaId, professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ficha", fichaId));
 
-        // 1. Passo Tático: Joga todas as ordens para um valor temporário alto (ex: + 1000)
+        // 1. Passo Tático: Afasta todos os itens para uma ordem temporária 
+        // para evitar conflito de chave única durante a atualização.
         List<ItemFichaTreino> itensDaFicha = itemRepository.findByFichaIdOrderByOrdemAsc(fichaId);
         for (ItemFichaTreino item : itensDaFicha) {
             item.setOrdem(item.getOrdem() + 1000); 
         }
         itemRepository.saveAll(itensDaFicha);
-        itemRepository.flush(); // Força o banco a gravar as ordens temporárias
+        itemRepository.flush(); // Força o banco a gravar as ordens temporárias agora
 
-        // 2. Agora aplica a nova ordem correta sem colisão
+        // 2. Agora aplica a ordem correta sem conflitos
         for (int i = 0; i < idsNaOrdem.size(); i++) {
             Long itemId = idsNaOrdem.get(i);
             ItemFichaTreino item = itemRepository.findById(itemId)

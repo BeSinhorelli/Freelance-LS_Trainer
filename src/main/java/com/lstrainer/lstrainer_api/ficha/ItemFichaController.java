@@ -37,6 +37,16 @@ public class ItemFichaController {
                 .body(itemService.adicionar(fichaId, request, user.getProfessorId()));
     }
 
+    // NOVO: Endpoint para atualizar um item
+    @PutMapping("/{itemId}")
+    public ResponseEntity<ItemFichaResponse> atualizar(
+            @PathVariable Long fichaId,
+            @PathVariable Long itemId,
+            @Valid @RequestBody ItemFichaRequest request,
+            @AuthenticationPrincipal ProfessorUserDetails user) {
+        return ResponseEntity.ok(itemService.atualizar(fichaId, itemId, request, user.getProfessorId()));
+    }
+
     @DeleteMapping("/{itemId}")
     public ResponseEntity<Void> remover(
             @PathVariable Long fichaId,
@@ -46,7 +56,6 @@ public class ItemFichaController {
         return ResponseEntity.noContent().build();
     }
 
-    // Recebendo a lista pura para evitar erro 400
     @PutMapping("/reordenar")
     public ResponseEntity<Void> reordenar(
             @PathVariable Long fichaId,
