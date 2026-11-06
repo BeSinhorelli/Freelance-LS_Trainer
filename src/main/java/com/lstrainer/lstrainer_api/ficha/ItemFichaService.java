@@ -81,6 +81,17 @@ public class ItemFichaService {
             throw new BusinessException("Este item não pertence à ficha informada.");
         }
 
+        Exercicio exercicio = exercicioRepository.findByIdAndProfessorId(request.exercicioId(), professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exercício", request.exercicioId()));
+        boolean exercicioJaExiste = itemRepository.findByFichaIdOrderByOrdemAsc(fichaId)
+                .stream()
+                .anyMatch(outroItem -> !outroItem.getId().equals(itemId)
+                        && outroItem.getExercicio().getId().equals(exercicio.getId()));
+        if (exercicioJaExiste) {
+            throw new BusinessException("Este exercício já está na ficha");
+        }
+
+        item.setExercicio(exercicio);
         item.setSeries(request.series());
         item.setRepeticoes(request.repeticoes());
         item.setCarga(request.carga());

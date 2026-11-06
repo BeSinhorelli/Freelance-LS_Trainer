@@ -47,7 +47,6 @@ interface TreinoAgendadoModalProps {
   alunoId: string | undefined;
   dataInicial: string;
   treinoParaEditar: TreinoAgendado | null;
-  itemParaEditarId?: number | null;
 }
 
 function novoItem(): ItemTreinoForm {
@@ -69,7 +68,6 @@ export function TreinoAgendadoModal({
   alunoId,
   dataInicial,
   treinoParaEditar,
-  itemParaEditarId,
 }: TreinoAgendadoModalProps) {
   const [exercicios, setExercicios] = useState<Exercicio[]>([]);
   const [data, setData] = useState(dataInicial);
@@ -240,7 +238,6 @@ export function TreinoAgendadoModal({
                     }
                   }}
                   disabled={!grupoMuscularDoItem(item)}
-                  autoFocus={itemParaEditarId != null && item.id === itemParaEditarId}
                   required
                 >
                   <option value="">
