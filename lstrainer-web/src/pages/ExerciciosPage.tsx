@@ -41,15 +41,16 @@ export function ExerciciosPage() {
     try {
       setLoading(true);
       
-      // Monta os parâmetros apenas se tiverem valor
       const params = new URLSearchParams();
+      // CORREÇÃO: Força o tamanho máximo para trazer todos
+      params.append('size', '1000');
+      
       if (busca.trim()) params.append('nome', busca.trim());
       if (grupoFiltro) params.append('grupoMuscular', grupoFiltro);
       if (statusFiltro === 'ativos') params.append('ativo', 'true');
       if (statusFiltro === 'inativos') params.append('ativo', 'false');
 
-      const url = params.toString() ? `/exercicios?${params.toString()}` : '/exercicios';
-      const response = await api.get(url);
+      const response = await api.get(`/exercicios?${params.toString()}`);
       setExercicios(response.data.content || response.data);
     } catch (error) {
       toast.error('Erro ao buscar exercícios');
@@ -138,7 +139,6 @@ export function ExerciciosPage() {
         <button className={styles.newBtn} onClick={abrirModalNovo}>+ Novo Exercício</button>
       </div>
 
-      {/* BARRA DE FILTROS */}
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', background: 'white', padding: '1rem', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
         <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
           <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}>🔍</span>

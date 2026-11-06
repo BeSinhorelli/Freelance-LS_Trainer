@@ -104,7 +104,8 @@ export function FichaDetailPage() {
       setLoading(true);
       const itensRes = await api.get(`/fichas/${id}/itens`);
       
-      const exRes = await api.get('/exercicios');
+      // CORREÇÃO: Adicionando ?size=1000 para trazer todos os exercícios
+      const exRes = await api.get('/exercicios?size=1000');
       const todosExercicios = exRes.data.content || exRes.data;
       setExerciciosDisponiveis(todosExercicios);
 
@@ -328,7 +329,6 @@ export function FichaDetailPage() {
         </div>
       </div>
 
-      {/* MODAL DE EDIÇÃO */}
       {isEditModalOpen && itemEditando && (
         <div className={styles.overlay} onClick={() => setIsEditModalOpen(false)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>

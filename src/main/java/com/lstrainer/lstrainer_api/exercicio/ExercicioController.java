@@ -27,7 +27,8 @@ public class ExercicioController {
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String grupoMuscular,
             @RequestParam(required = false) Boolean ativo,
-            @PageableDefault(size = 20, sort = "nome") Pageable pageable,
+            // AUMENTADO PARA 1000 PARA TRAZER TODOS
+            @PageableDefault(size = 1000, sort = "nome") Pageable pageable,
             @AuthenticationPrincipal ProfessorUserDetails user) {
         return ResponseEntity.ok(exercicioService.listar(user.getProfessorId(), nome, grupoMuscular, ativo, pageable));
     }
