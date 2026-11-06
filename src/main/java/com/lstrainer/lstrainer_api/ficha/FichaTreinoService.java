@@ -50,6 +50,12 @@ public class FichaTreinoService {
         Aluno aluno = alunoRepository.findByIdAndProfessorId(request.alunoId(), professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Aluno", request.alunoId()));
 
+        // VALIDAÇÃO DE DUPLICIDADE
+        boolean jaExiste = fichaRepository.existsByAlunoIdAndObjetivoIgnoreCase(aluno.getId(), request.objetivo());
+        if (jaExiste) {
+            throw new BusinessException("Já existe uma ficha com este objetivo para este aluno.");
+        }
+
         Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor", professorId));
 
@@ -69,6 +75,14 @@ public class FichaTreinoService {
     @Transactional
     public FichaTreinoResponse atualizar(Long id, FichaTreinoRequest request, Long professorId) {
         FichaTreino ficha = findFichaByIdAndProfessor(id, professorId);
+
+        // VALIDAÇÃO DE DUPLICIDADE (se o objetivo mudou)
+        if (!ficha.getObjetivo().equalsIgnoreCase(request.objetivo())) {
+            boolean jaExiste = fichaRepository.existsByAlunoIdAndObjetivoIgnoreCase(ficha.getAluno().getId(), request.objetivo());
+            if (jaExiste) {
+                throw new BusinessException("Já existe outra ficha com este objetivo para este aluno.");
+            }
+        }
 
         if (!ficha.getAluno().getId().equals(request.alunoId())) {
             Aluno novoAluno = alunoRepository.findByIdAndProfessorId(request.alunoId(), professorId)

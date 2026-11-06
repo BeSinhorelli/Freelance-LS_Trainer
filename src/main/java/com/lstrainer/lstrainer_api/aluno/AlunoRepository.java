@@ -16,6 +16,8 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     Optional<Aluno> findByIdAndProfessorId(Long id, Long professorId);
 
-    // NOVO MÉTODO: Conta os alunos do professor diretamente no banco de dados
     long countByProfessorId(Long professorId);
+
+    // NOVO: Verifica se já existe um aluno com o mesmo nome para o professor
+    boolean existsByProfessorIdAndNomeIgnoreCase(Long professorId, String nome);
 }

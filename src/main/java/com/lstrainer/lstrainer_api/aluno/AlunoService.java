@@ -64,6 +64,12 @@ public class AlunoService {
         Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor", professorId));
 
+        // VALIDAÇÃO DE DUPLICIDADE
+        boolean jaExiste = alunoRepository.existsByProfessorIdAndNomeIgnoreCase(professorId, request.nome());
+        if (jaExiste) {
+            throw new BusinessException("Já existe um aluno com este nome.");
+        }
+
         Aluno aluno = Aluno.builder()
                 .professor(professor)
                 .nome(request.nome())
@@ -80,6 +86,14 @@ public class AlunoService {
     @Transactional
     public AlunoResponse atualizar(Long id, AlunoRequest request, Long professorId) {
         Aluno aluno = findAlunoByIdAndProfessor(id, professorId);
+
+        // VALIDAÇÃO DE DUPLICIDADE (se o nome mudou)
+        if (!aluno.getNome().equalsIgnoreCase(request.nome())) {
+            boolean jaExiste = alunoRepository.existsByProfessorIdAndNomeIgnoreCase(professorId, request.nome());
+            if (jaExiste) {
+                throw new BusinessException("Já existe outro aluno com este nome.");
+            }
+        }
 
         aluno.setNome(request.nome());
         aluno.setDataNascimento(request.dataNascimento());

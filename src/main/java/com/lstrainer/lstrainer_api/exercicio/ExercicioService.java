@@ -46,6 +46,12 @@ public class ExercicioService {
         Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor", professorId));
 
+        // VALIDAÇÃO DE DUPLICIDADE
+        boolean jaExiste = exercicioRepository.existsByProfessorIdAndNomeIgnoreCase(professorId, request.nome());
+        if (jaExiste) {
+            throw new BusinessException("Já existe um exercício com este nome.");
+        }
+
         Exercicio exercicio = Exercicio.builder()
                 .professor(professor)
                 .nome(request.nome())
@@ -61,6 +67,14 @@ public class ExercicioService {
     @Transactional
     public ExercicioResponse atualizar(Long id, ExercicioRequest request, Long professorId) {
         Exercicio exercicio = findExercicioByIdAndProfessor(id, professorId);
+
+        // VALIDAÇÃO DE DUPLICIDADE (se o nome mudou)
+        if (!exercicio.getNome().equalsIgnoreCase(request.nome())) {
+            boolean jaExiste = exercicioRepository.existsByProfessorIdAndNomeIgnoreCase(professorId, request.nome());
+            if (jaExiste) {
+                throw new BusinessException("Já existe outro exercício com este nome.");
+            }
+        }
 
         exercicio.setNome(request.nome());
         exercicio.setGrupoMuscular(request.grupoMuscular());

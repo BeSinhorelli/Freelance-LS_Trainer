@@ -20,7 +20,9 @@ public interface FichaTreinoRepository extends JpaRepository<FichaTreino, Long> 
     long countByProfessorIdAndStatus(Long professorId, String status);
     long countByProfessorIdAndProximaReavaliacaoBetween(Long professorId, LocalDate inicio, LocalDate fim);
 
-    // A MÁGICA ACONTECE AQUI: JOIN FETCH traz o aluno na mesma consulta
     @Query("SELECT f FROM FichaTreino f JOIN FETCH f.aluno a WHERE f.professor.id = :professorId AND f.status = 'ATIVA' ORDER BY f.proximaReavaliacao ASC")
     List<FichaTreino> buscarReavaliacoesProximas(@Param("professorId") Long professorId);
+
+    // NOVO: Verifica se já existe uma ficha com o mesmo objetivo para o aluno
+    boolean existsByAlunoIdAndObjetivoIgnoreCase(Long alunoId, String objetivo);
 }
