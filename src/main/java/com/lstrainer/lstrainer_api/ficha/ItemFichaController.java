@@ -2,6 +2,7 @@ package com.lstrainer.lstrainer_api.ficha;
 
 import com.lstrainer.lstrainer_api.ficha.dto.ItemFichaRequest;
 import com.lstrainer.lstrainer_api.ficha.dto.ItemFichaResponse;
+import com.lstrainer.lstrainer_api.ficha.dto.ReordenarRequest;
 import com.lstrainer.lstrainer_api.security.ProfessorUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -46,12 +47,13 @@ public class ItemFichaController {
         return ResponseEntity.noContent().build();
     }
 
+    // ENDPOINT CORRIGIDO COM O DTO
     @PutMapping("/reordenar")
     public ResponseEntity<Void> reordenar(
             @PathVariable Long fichaId,
-            @RequestBody List<Long> idsNaOrdem,
+            @RequestBody ReordenarRequest request,
             @AuthenticationPrincipal ProfessorUserDetails user) {
-        itemService.reordenar(fichaId, idsNaOrdem, user.getProfessorId());
+        itemService.reordenar(fichaId, request.idsNaOrdem(), user.getProfessorId());
         return ResponseEntity.noContent().build();
     }
 }
