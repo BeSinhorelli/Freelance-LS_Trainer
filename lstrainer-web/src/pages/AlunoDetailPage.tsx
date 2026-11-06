@@ -79,6 +79,7 @@ export function AlunoDetailPage() {
     return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
   });
   const [treinoEditando, setTreinoEditando] = useState<TreinoAgendado | null>(null);
+  const [itemTreinoEditandoId, setItemTreinoEditandoId] = useState<number | null>(null);
   const [isTreinoModalOpen, setIsTreinoModalOpen] = useState(false);
   const [mostrarTreinos, setMostrarTreinos] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -212,7 +213,7 @@ export function AlunoDetailPage() {
               <h2>Calendário de Treinos</h2>
               <button
                 className={styles.newBtn}
-                onClick={() => { setTreinoEditando(null); setIsTreinoModalOpen(true); }}
+                onClick={() => { setTreinoEditando(null); setItemTreinoEditandoId(null); setIsTreinoModalOpen(true); }}
               >
                 + Agendar treino
               </button>
@@ -255,9 +256,21 @@ export function AlunoDetailPage() {
                       <p><strong>Exercícios:</strong> {treino.itens.length} exercícios</p>
                       <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.25rem', color: '#475569', fontSize: '0.9rem' }}>
                         {[...treino.itens].sort((a, b) => a.ordem - b.ordem).map((item) => (
-                          <li key={item.id}>
+                          <li key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
                             {item.exercicioNome} — {item.series} séries × {item.repeticoes}
                             {item.carga ? `, ${item.carga}` : ''}
+                            <button
+                              type="button"
+                              aria-label={`Editar exercício ${item.exercicioNome}`}
+                              onClick={() => {
+                                setTreinoEditando(treino);
+                                setItemTreinoEditandoId(item.id);
+                                setIsTreinoModalOpen(true);
+                              }}
+                              style={{ background: '#f1f5f9', color: '#1e40af', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '6px', cursor: 'pointer' }}
+                            >
+                              ✏️
+                            </button>
                           </li>
                         ))}
                       </ul>
@@ -266,7 +279,7 @@ export function AlunoDetailPage() {
                       <button
                         type="button"
                         aria-label={`Editar ${treino.nomeTreino}`}
-                        onClick={() => { setTreinoEditando(treino); setIsTreinoModalOpen(true); }}
+                        onClick={() => { setTreinoEditando(treino); setItemTreinoEditandoId(null); setIsTreinoModalOpen(true); }}
                         style={{ background: '#f1f5f9', color: '#1e40af', border: 'none', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer' }}
                       >
                         ✏️
@@ -353,6 +366,7 @@ export function AlunoDetailPage() {
         alunoId={id}
         dataInicial={dataSelecionada}
         treinoParaEditar={treinoEditando}
+        itemParaEditarId={itemTreinoEditandoId}
       />
     </div>
   );

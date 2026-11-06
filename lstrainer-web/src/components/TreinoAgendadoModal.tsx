@@ -30,7 +30,9 @@ interface TreinoAgendado {
 }
 
 interface ItemTreinoForm {
+  id?: number;
   exercicioId: string;
+  grupoMuscular: string;
   series: string;
   repeticoes: string;
   carga: string;
@@ -45,11 +47,13 @@ interface TreinoAgendadoModalProps {
   alunoId: string | undefined;
   dataInicial: string;
   treinoParaEditar: TreinoAgendado | null;
+  itemParaEditarId?: number | null;
 }
 
 function novoItem(): ItemTreinoForm {
   return {
     exercicioId: '',
+    grupoMuscular: '',
     series: '3',
     repeticoes: '10',
     carga: '',
@@ -65,6 +69,7 @@ export function TreinoAgendadoModal({
   alunoId,
   dataInicial,
   treinoParaEditar,
+  itemParaEditarId,
 }: TreinoAgendadoModalProps) {
   const [exercicios, setExercicios] = useState<Exercicio[]>([]);
   const [data, setData] = useState(dataInicial);
@@ -82,6 +87,8 @@ export function TreinoAgendadoModal({
         .sort((a, b) => a.ordem - b.ordem)
         .map((item) => ({
           exercicioId: String(item.exercicioId),
+          id: item.id,
+          grupoMuscular: '',
           series: String(item.series),
           repeticoes: item.repeticoes,
           carga: item.carga ?? '',
@@ -104,6 +111,18 @@ export function TreinoAgendadoModal({
     void carregarExercicios();
     return () => { active = false; };
   }, [isOpen, dataInicial, treinoParaEditar]);
+
+  const gruposMusculares = [...new Set(
+    exercicios
+      .map((exercicio) => exercicio.grupoMuscular?.trim())
+      .filter((grupo): grupo is string => Boolean(grupo)),
+  )].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+  function grupoMuscularDoItem(item: ItemTreinoForm) {
+    return item.grupoMuscular
+      || exercicios.find((exercicio) => String(exercicio.id) === item.exercicioId)?.grupoMuscular?.trim()
+      || '';
+  }
 
   function atualizarItem(index: number, campo: keyof ItemTreinoForm, valor: string) {
     setItens((atuais) => atuais.map((item, itemIndex) => (
@@ -192,19 +211,50 @@ export function TreinoAgendadoModal({
             <fieldset className={styles.item} key={index}>
               <legend>Exercício {index + 1}</legend>
               <div className={styles.field}>
+                <label htmlFor={`grupo-muscular-${index}`}>Grupo muscular *</label>
+                <select
+                  id={`grupo-muscular-${index}`}
+                  value={grupoMuscularDoItem(item)}
+                  onChange={(event) => {
+                    atualizarItem(index, 'grupoMuscular', event.target.value);
+                    atualizarItem(index, 'exercicioId', '');
+                  }}
+                  required
+                >
+                  <option value="">Selecione um grupo muscular</option>
+                  {gruposMusculares.map((grupo) => (
+                    <option key={grupo} value={grupo}>{grupo}</option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.field}>
                 <label htmlFor={`exercicio-${index}`}>Exercício *</label>
                 <select
                   id={`exercicio-${index}`}
                   value={item.exercicioId}
-                  onChange={(event) => atualizarItem(index, 'exercicioId', event.target.value)}
+                  onChange={(event) => {
+                    const exercicio = exercicios.find((opcao) => String(opcao.id) === event.target.value);
+                    atualizarItem(index, 'exercicioId', event.target.value);
+                    if (exercicio?.grupoMuscular) {
+                      atualizarItem(index, 'grupoMuscular', exercicio.grupoMuscular.trim());
+                    }
+                  }}
+                  disabled={!grupoMuscularDoItem(item)}
+                  autoFocus={itemParaEditarId != null && item.id === itemParaEditarId}
                   required
                 >
-                  <option value="">Selecione um exercício</option>
-                  {exercicios.map((exercicio) => (
+                  <option value="">
+                    {grupoMuscularDoItem(item)
+                      ? 'Selecione um exercício'
+                      : 'Selecione um grupo muscular primeiro'}
+                  </option>
+                  {exercicios
+                    .filter((exercicio) => exercicio.grupoMuscular?.trim() === grupoMuscularDoItem(item))
+                    .map((exercicio) => (
                     <option key={exercicio.id} value={exercicio.id}>
                       {exercicio.nome}{exercicio.grupoMuscular ? ` — ${exercicio.grupoMuscular}` : ''}
                     </option>
-                  ))}
+                    ))}
                 </select>
               </div>
 

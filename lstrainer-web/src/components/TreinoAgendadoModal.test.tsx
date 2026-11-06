@@ -34,8 +34,10 @@ describe('TreinoAgendadoModal', () => {
       />,
     );
 
-    await screen.findByRole('option', { name: 'Agachamento — Pernas' });
+    await screen.findByRole('option', { name: 'Pernas' });
     fireEvent.change(screen.getByLabelText('Nome do treino *'), { target: { value: 'Treino de pernas' } });
+    fireEvent.change(screen.getByLabelText('Grupo muscular *'), { target: { value: 'Pernas' } });
+    await screen.findByRole('option', { name: 'Agachamento — Pernas' });
     fireEvent.change(screen.getByLabelText('Exercício *'), { target: { value: '7' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar treino' }));
 
@@ -53,5 +55,36 @@ describe('TreinoAgendadoModal', () => {
       }],
     }));
     expect(onSuccess).toHaveBeenCalledOnce();
+  });
+
+  it('filtra os exercícios pelo grupo muscular selecionado', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      data: {
+        content: [
+          { id: 7, nome: 'Agachamento', grupoMuscular: 'Pernas' },
+          { id: 8, nome: 'Supino', grupoMuscular: 'Peitoral' },
+        ],
+      },
+    });
+
+    render(
+      <TreinoAgendadoModal
+        isOpen
+        onClose={vi.fn()}
+        onSuccess={vi.fn()}
+        alunoId="12"
+        dataInicial="2026-11-06"
+        treinoParaEditar={null}
+      />,
+    );
+
+    const exercicioSelect = screen.getByLabelText('Exercício *');
+    await screen.findByRole('option', { name: 'Peitoral' });
+
+    fireEvent.change(screen.getByLabelText('Grupo muscular *'), { target: { value: 'Peitoral' } });
+
+    expect(exercicioSelect).toBeEnabled();
+    expect(screen.getByRole('option', { name: 'Supino — Peitoral' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Agachamento — Pernas' })).not.toBeInTheDocument();
   });
 });
