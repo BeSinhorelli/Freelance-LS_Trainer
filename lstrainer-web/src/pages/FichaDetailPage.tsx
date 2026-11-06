@@ -270,29 +270,6 @@ export function FichaDetailPage() {
           </form>
         </div>
       </div>
-
-      {/* MODAL DE AGENDAMENTO */}
-      {isAgendaModalOpen && (
-        <div className={styles.overlay} onClick={() => setIsAgendaModalOpen(false)}>
-          <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <h2>Agendar Treino</h2>
-            <form onSubmit={handleAgendarTreino} className={styles.form}>
-              <div className={styles.field}>
-                <label>Data do Treino</label>
-                <input type="date" value={dataAgendamento} onChange={e => setDataAgendamento(e.target.value)} required />
-              </div>
-              <div className={styles.field}>
-                <label>Nome do Treino (Ex: Treino A, Treino B)</label>
-                <input type="text" value={nomeTreino} onChange={e => setNomeTreino(e.target.value)} required maxLength={30} />
-              </div>
-              <div className={styles.actions}>
-                <button type="button" onClick={() => setIsAgendaModalOpen(false)} className={styles.cancelBtn}>Cancelar</button>
-                <button type="submit" className={styles.addBtn}>Agendar</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
