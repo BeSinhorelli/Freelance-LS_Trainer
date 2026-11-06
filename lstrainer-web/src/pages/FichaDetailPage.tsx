@@ -152,8 +152,8 @@ export function FichaDetailPage() {
 
       try {
         const idsNaOrdem = novaLista.map(item => item.id);
-        // Enviando o JSON como { idsNaOrdem: [...] } para o Backend
-        await api.put(`/fichas/${id}/itens/reordenar`, { idsNaOrdem });
+        // CORREÇÃO: Enviando a lista pura para o backend
+        await api.put(`/fichas/${id}/itens/reordenar`, idsNaOrdem);
         toast.success('Ordem salva!');
       } catch (error) {
         toast.error('Erro ao salvar a ordem.');
@@ -173,6 +173,7 @@ export function FichaDetailPage() {
       <button onClick={() => navigate(-1)} className={styles.backBtn}>← Voltar</button>
       
       <div className={styles.layout}>
+        {/* COLUNA ESQUERDA */}
         <div className={styles.treinoList}>
           <h2>Treino Montado</h2>
           {itens.length === 0 ? (
@@ -190,11 +191,11 @@ export function FichaDetailPage() {
           )}
         </div>
 
+        {/* COLUNA DIREITA (FILTRO E ADICIONAR) */}
         <div className={styles.addPanel}>
           <h2>Adicionar Exercício</h2>
           <form onSubmit={handleAdicionarExercicio} className={styles.form}>
             
-            {/* FILTRO POR GRUPO MUSCULAR */}
             <div className={styles.field}>
               <label>Filtrar por Grupo</label>
               <select value={grupoFiltro} onChange={e => setGrupoFiltro(e.target.value)}>
