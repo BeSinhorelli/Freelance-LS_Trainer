@@ -21,13 +21,18 @@ spring:
               - email
               - profile
 
-# CONFIGURAÇÃO PARA O RENDER (Proxy Reverso)
 server:
-  forward-headers-strategy: native # Confia no X-Forwarded-For
+  forward-headers-strategy: native
   tomcat:
     max-http-form-post-size: 2MB
     max-swallow-size: 2MB
   max-http-request-header-size: 16KB
+  # CONFIGURAÇÃO DE ENCODING PARA CORRIGIR ACENTOS
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 app:
   jwt:

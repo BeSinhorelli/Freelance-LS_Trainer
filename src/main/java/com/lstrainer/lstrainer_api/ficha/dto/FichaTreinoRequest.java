@@ -10,7 +10,7 @@ public record FichaTreinoRequest(
         Long alunoId,
 
         @NotBlank(message = "O objetivo é obrigatório")
-        @Size(max = 255, message = "O objetivo deve ter no máximo 255 caracteres")
+        @Size(max = 100, message = "O objetivo deve ter no máximo 255 caracteres")
         String objetivo,
 
         LocalDate dataRevisao,

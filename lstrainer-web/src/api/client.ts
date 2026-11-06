@@ -1,13 +1,12 @@
 import axios from 'axios';
 
-// IMPORTANTE: Substitua 'lstrainer-api' pela URL real que o Render te deu!
-// Não esqueça do /api no final.
-const API_URL = 'https://lstrainer-api.onrender.com/api'; 
+const API_URL = 'https://lstrainer-api.onrender.com/api';
 
 export const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // CRUCIAL: Permite que o Axios envie e receba cookies
+  withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json; charset=utf-8', // <-- FORÇA O ENVIO EM UTF-8
+    'Accept': 'application/json; charset=utf-8'        // <-- FORÇA O RECEBIMENTO EM UTF-8
   },
 });
