@@ -13,8 +13,6 @@
   cursor: pointer;
   width: fit-content;
   font-weight: 500;
-  padding: 0;
-  transition: color 0.2s;
 }
 
 .backBtn:hover {
@@ -27,14 +25,13 @@
   align-items: flex-start;
 }
 
-/* Coluna Esquerda */
 .treinoList {
   flex: 1;
   background: white;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  min-width: 0; /* Previne estouro de flexbox */
+  min-width: 0;
 }
 
 .treinoList h2 {
@@ -56,6 +53,11 @@
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.itemCard:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .itemHeader {
@@ -90,10 +92,12 @@
   gap: 1rem;
   font-size: 0.9rem;
   color: #475569;
+  padding-left: 2.5rem;
 }
 
 .itemObs {
   margin-top: 0.5rem;
+  margin-left: 2.5rem;
   font-size: 0.85rem;
   color: #854d0e;
   background: #fef9c3;
@@ -101,7 +105,6 @@
   border-radius: 4px;
 }
 
-/* Coluna Direita (Painel de Adicionar) */
 .addPanel {
   width: 350px;
   background: white;
@@ -110,7 +113,7 @@
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   position: sticky;
   top: 2rem;
-  box-sizing: border-box; /* CRÍTICO: Impede que o padding estoure a largura */
+  box-sizing: border-box;
 }
 
 .addPanel h2 {
@@ -134,7 +137,7 @@
 
 .row > .field {
   flex: 1;
-  min-width: 0; /* CRÍTICO: Impede que inputs lado a lado estourem o container */
+  min-width: 0;
 }
 
 .field {
@@ -150,9 +153,8 @@
   color: #475569;
 }
 
-.field input,
-.field select {
-  width: 100%; /* CRÍTICO: Faz o input respeitar o tamanho do seu container */
+.field input, .field select {
+  width: 100%;
   box-sizing: border-box;
   padding: 0.6rem;
   border-radius: 6px;
@@ -160,8 +162,7 @@
   font-size: 0.95rem;
 }
 
-.field input:focus,
-.field select:focus {
+.field input:focus, .field select:focus {
   outline: none;
   border-color: #1e40af;
 }
@@ -177,7 +178,6 @@
   cursor: pointer;
   margin-top: 0.5rem;
   width: 100%;
-  transition: background 0.2s;
 }
 
 .addBtn:hover {
@@ -199,12 +199,10 @@
   margin-top: 2rem;
 }
 
-/* Responsividade para Celulares e Tablets */
 @media (max-width: 900px) {
   .layout {
-    flex-direction: column-reverse; /* No celular, o formulário fica em cima */
+    flex-direction: column-reverse;
   }
-
   .addPanel {
     width: 100%;
     position: static;

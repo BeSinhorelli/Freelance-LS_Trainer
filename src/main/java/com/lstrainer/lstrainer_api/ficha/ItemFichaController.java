@@ -45,4 +45,14 @@ public class ItemFichaController {
         itemService.remover(itemId, user.getProfessorId());
         return ResponseEntity.noContent().build();
     }
+
+    // NOVO ENDPOINT PARA REORDENAR
+    @PutMapping("/reordenar")
+    public ResponseEntity<Void> reordenar(
+            @PathVariable Long fichaId,
+            @RequestBody List<Long> idsNaOrdem,
+            @AuthenticationPrincipal ProfessorUserDetails user) {
+        itemService.reordenar(fichaId, idsNaOrdem, user.getProfessorId());
+        return ResponseEntity.noContent().build();
+    }
 }
