@@ -3,9 +3,6 @@
 <p align="center">
   <em>Sistema de Gestão de Fichas de Treino</em>
 </p>
-<div align="center">
-
-</div>
 
 ---
 
@@ -21,11 +18,12 @@
 
 ## 🚀 Funcionalidades
 
-- 🔐 **Autenticação Segura:** Login e cadastro com JWT em cookies `HttpOnly`.
+- 🔐 **Autenticação Segura:** Login exclusivo via **Google (OAuth2)**, sem armazenamento de senhas no banco de dados.
 - 👥 **Gestão de Alunos:** CRUD completo com isolamento de dados por professor (prevenção de IDOR).
 - 🏋️ **Exercícios e Fichas:** Biblioteca de exercícios e montagem dinâmica de treinos (séries, repetições, cargas).
 - 📏 **Avaliações e Cardio:** Histórico de medidas e prescrições cardiovasculares.
 - 📊 **Dashboard:** Painel com contadores reais e lista de reavaliações próximas.
+- 🛡️ **Segurança:** Sanitização de XSS, validação de tamanho (DoS) e Rate Limit com Bucket4j.
 
 ---
 
@@ -35,7 +33,7 @@
 
 | **Back-end** | **Front-end** | **Database** | **DevOps** |
 |:---:|:---:|:---:|:---:|
-| ![Java](https://skillicons.dev/icons?i=java) ![Spring](https://skillicons.dev/icons?i=spring) | ![React](https://skillicons.dev/icons?i=react) ![TypeScript](https://skillicons.dev/icons?i=typescript) ![CSS](https://skillicons.dev/icons?i=css) ![Vite](https://skillicons.dev/icons?i=vite) | ![PostgreSQL](https://skillicons.dev/icons?i=postgresql) | ![Docker](https://skillicons.dev/icons?i=docker) ![GitHub Actions](https://skillicons.dev/icons?i=githubactions) |
+| ![Java](https://skillicons.dev/icons?i=java) ![Spring](https://skillicons.dev/icons?i=spring) | ![React](https://skillicons.dev/icons?i=react) ![TypeScript](https://skillicons.dev/icons?i=typescript) ![Vite](https://skillicons.dev/icons?i=vite) | ![PostgreSQL](https://skillicons.dev/icons?i=postgresql) | ![Docker](https://skillicons.dev/icons?i=docker) ![GitHub Actions](https://skillicons.dev/icons?i=githubactions) |
 
 </div>
 
@@ -57,7 +55,19 @@ O sistema foi arquitetado de forma distribuída:
 - **Vercel:** Hospeda o frontend React (SPA).
 - **Render:** Hospeda a API Spring Boot (conteinerizada com Docker).
 - **Neon.tech:** Banco de dados PostgreSQL Serverless.
+- **Google Cloud:** Provedor de identidade (OAuth2) para login seguro.
 - A comunicação entre Vercel e Render é protegida por **CORS** e **Cookies SameSite=None**, garantindo autenticação segura entre domínios diferentes.
+
+---
+
+## 🛡️ Segurança e Boas Práticas
+
+- **OAuth2 (Google):** Elimina o risco de vazamento de senhas e ataques de força bruta.
+- **JWT em Cookies HttpOnly:** Protege o token contra ataques XSS (o JavaScript não consegue ler o cookie).
+- **Isolamento de Dados (IDOR):** Todas as queries filtram pelo ID do professor logado. Um professor não vê os dados de outro.
+- **Rate Limit (Bucket4j):** Protege o backend contra abusos e ataques de negação de serviço (DoS), limitando requisições por IP.
+- **Sanitização de Entradas:** Prevenção contra XSS e injeção de scripts em todos os campos de texto.
+- **Validação de Tamanho:** Limites de caracteres no Backend e Frontend para evitar payloads gigantes.
 
 ---
 
