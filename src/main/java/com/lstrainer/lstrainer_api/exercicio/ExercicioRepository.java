@@ -12,8 +12,9 @@ import java.util.Optional;
 @Repository
 public interface ExercicioRepository extends JpaRepository<Exercicio, Long> {
 
+    // Query robusta que aceita filtros nulos (opcionais)
     @Query("SELECT e FROM Exercicio e WHERE e.professor.id = :professorId " +
-           "AND (:nome IS NULL OR LOWER(e.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) " +
+           "AND (:nome IS NULL OR LOWER(e.nome) LIKE LOWER(CONCAT('%', CAST(:nome AS string), '%'))) " +
            "AND (:grupo IS NULL OR e.grupoMuscular = :grupo) " +
            "AND (:ativo IS NULL OR e.ativo = :ativo) " +
            "ORDER BY e.nome")
@@ -28,6 +29,6 @@ public interface ExercicioRepository extends JpaRepository<Exercicio, Long> {
     Page<Exercicio> findByProfessorId(Long professorId, Pageable pageable);
     Optional<Exercicio> findByIdAndProfessorId(Long id, Long professorId);
 
-    // NOVO: Verifica se já existe um exercício com o mesmo nome para o professor
+    // Validação de duplicidade
     boolean existsByProfessorIdAndNomeIgnoreCase(Long professorId, String nome);
 }

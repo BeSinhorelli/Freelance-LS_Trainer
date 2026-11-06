@@ -1,4 +1,5 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect } from 'react';
+import type { FormEvent } from 'react';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
 import styles from './ExerciciosPage.module.css';
@@ -39,13 +40,16 @@ export function ExerciciosPage() {
   async function carregarExercicios() {
     try {
       setLoading(true);
+      
+      // Monta os parâmetros apenas se tiverem valor
       const params = new URLSearchParams();
-      if (busca) params.append('nome', busca);
+      if (busca.trim()) params.append('nome', busca.trim());
       if (grupoFiltro) params.append('grupoMuscular', grupoFiltro);
       if (statusFiltro === 'ativos') params.append('ativo', 'true');
       if (statusFiltro === 'inativos') params.append('ativo', 'false');
 
-      const response = await api.get(`/exercicios?${params.toString()}`);
+      const url = params.toString() ? `/exercicios?${params.toString()}` : '/exercicios';
+      const response = await api.get(url);
       setExercicios(response.data.content || response.data);
     } catch (error) {
       toast.error('Erro ao buscar exercícios');
@@ -143,7 +147,7 @@ export function ExerciciosPage() {
             placeholder="Pesquisar por nome..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            maxLength={150} // LIMITE DE CARACTERES NA BUSCA
+            maxLength={150}
             style={{ width: '100%', padding: '0.7rem 1rem 0.7rem 2.5rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
           />
         </div>
@@ -201,7 +205,7 @@ export function ExerciciosPage() {
                   value={nome} 
                   onChange={e => setNome(e.target.value)} 
                   required 
-                  maxLength={150} // LIMITE DE CARACTERES
+                  maxLength={150}
                 />
               </div>
               
@@ -223,7 +227,7 @@ export function ExerciciosPage() {
                   type="text" 
                   value={descricao} 
                   onChange={e => setDescricao(e.target.value)} 
-                  maxLength={1000} // LIMITE DE CARACTERES
+                  maxLength={1000}
                 />
               </div>
               <div className={styles.field}>
@@ -232,7 +236,7 @@ export function ExerciciosPage() {
                   value={instrucoes} 
                   onChange={e => setInstrucoes(e.target.value)} 
                   rows={3} 
-                  maxLength={1000} // LIMITE DE CARACTERES
+                  maxLength={1000}
                 />
               </div>
 

@@ -29,8 +29,9 @@ public class ExercicioService {
 
     @Transactional(readOnly = true)
     public Page<ExercicioResponse> listar(Long professorId, String nome, String grupoMuscular, Boolean ativo, Pageable pageable) {
-        String nomeFiltro = (nome == null || nome.isBlank()) ? null : nome;
-        String grupoFiltro = (grupoMuscular == null || grupoMuscular.isBlank()) ? null : grupoMuscular;
+        // Trata strings vazias ou com espaços como NULL para ignorar o filtro
+        String nomeFiltro = (nome == null || nome.isBlank()) ? null : nome.trim();
+        String grupoFiltro = (grupoMuscular == null || grupoMuscular.isBlank()) ? null : grupoMuscular.trim();
 
         Page<Exercicio> page = exercicioRepository.buscarComFiltros(professorId, nomeFiltro, grupoFiltro, ativo, pageable);
         return page.map(ExercicioResponse::from);
@@ -46,7 +47,6 @@ public class ExercicioService {
         Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor", professorId));
 
-        // VALIDAÇÃO DE DUPLICIDADE
         boolean jaExiste = exercicioRepository.existsByProfessorIdAndNomeIgnoreCase(professorId, request.nome());
         if (jaExiste) {
             throw new BusinessException("Já existe um exercício com este nome.");
@@ -68,7 +68,6 @@ public class ExercicioService {
     public ExercicioResponse atualizar(Long id, ExercicioRequest request, Long professorId) {
         Exercicio exercicio = findExercicioByIdAndProfessor(id, professorId);
 
-        // VALIDAÇÃO DE DUPLICIDADE (se o nome mudou)
         if (!exercicio.getNome().equalsIgnoreCase(request.nome())) {
             boolean jaExiste = exercicioRepository.existsByProfessorIdAndNomeIgnoreCase(professorId, request.nome());
             if (jaExiste) {
