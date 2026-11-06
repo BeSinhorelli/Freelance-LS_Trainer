@@ -1,6 +1,7 @@
 package com.lstrainer.lstrainer_api.agenda.dto;
 
 import com.lstrainer.lstrainer_api.agenda.AgendaTreino;
+
 import java.time.LocalDate;
 
 public record AgendaTreinoResponse(
@@ -8,6 +9,7 @@ public record AgendaTreinoResponse(
         Long alunoId,
         String alunoNome,
         Long fichaId,
+        String fichaObjetivo, // NOVO: Para mostrar "Treino A (Hipertrofia)"
         LocalDate data,
         String diaSemana,
         String observacoes
@@ -18,6 +20,7 @@ public record AgendaTreinoResponse(
                 a.getAluno().getId(),
                 a.getAluno().getNome(),
                 a.getFicha() != null ? a.getFicha().getId() : null,
+                a.getFicha() != null ? a.getFicha().getObjetivo() : null, // NOVO
                 a.getData(),
                 a.getDiaSemana(),
                 a.getObservacoes()
