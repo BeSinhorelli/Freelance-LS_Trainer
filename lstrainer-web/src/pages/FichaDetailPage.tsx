@@ -178,14 +178,6 @@ export function FichaDetailPage() {
           <div className={styles.headerLista}>
             <h2>Treino Montado</h2>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              {/* BOTÃO DE AGENDAR */}
-              <button 
-                onClick={() => setIsAgendaModalOpen(true)} 
-                className={styles.agendarBtn}
-              >
-                📅 Agendar Treino
-              </button>
-
               <select value={grupoFiltroLista} onChange={e => setGrupoFiltroLista(e.target.value)} className={styles.selectFiltro}>
                 <option value="">Todos os grupos</option>
                 <option value="Peitoral">Peitoral</option>
