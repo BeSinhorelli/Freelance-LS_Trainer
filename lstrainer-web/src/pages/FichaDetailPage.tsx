@@ -26,9 +26,10 @@ import styles from './FichaDetailPage.module.css';
 interface ItemFicha {
   id: number; exercicioId: number; exercicioNome: string; ordem: number;
   series: number; repeticoes: string; carga?: string; descansoSegundos?: number; observacoes?: string;
+  grupoMuscular?: string; // Vamos precisar disso para o filtro
 }
 
-interface Exercicio { id: number; nome: string; grupoMuscular: string; }
+// ... (interfaces)
 
 function SortableItem({ item, onRemove }: { item: ItemFicha, onRemove: (id: number) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
@@ -67,12 +68,12 @@ export function FichaDetailPage() {
   const navigate = useNavigate();
 
   const [itens, setItens] = useState<ItemFicha[]>([]);
-  const [exerciciosDisponiveis, setExerciciosDisponiveis] = useState<Exercicio[]>([]);
+  const [exerciciosDisponiveis, setExerciciosDisponiveis] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filtros
-  const [grupoFiltro, setGrupoFiltro] = useState(''); // Para o painel de adicionar
-  const [filtroLista, setFiltroLista] = useState(''); // Para a lista de montados
+  // Estados dos Filtros
+  const [grupoFiltroAdicionar, setGrupoFiltroAdicionar] = useState(''); // Painel da direita
+  const [grupoFiltroLista, setGrupoFiltroLista] = useState(''); // NOVO: Filtro da lista da esquerda
 
   const [exercicioId, setExercicioId] = useState('');
   const [series, setSeries] = useState('3');
@@ -91,10 +92,19 @@ export function FichaDetailPage() {
     try {
       setLoading(true);
       const itensRes = await api.get(`/fichas/${id}/itens`);
-      setItens(itensRes.data);
 
+      // Para o filtro da lista funcionar, precisamos saber o grupo muscular de cada item.
+      // Vamos cruzar os itens com a lista de exercícios disponíveis.
       const exRes = await api.get('/exercicios');
-      setExerciciosDisponiveis(exRes.data.content || exRes.data);
+      const todosExercicios = exRes.data.content || exRes.data;
+      setExerciciosDisponiveis(todosExercicios);
+
+      const itensComGrupo = itensRes.data.map((item: ItemFicha) => {
+        const ex = todosExercicios.find((e: any) => e.id === item.exercicioId);
+        return { ...item, grupoMuscular: ex ? ex.grupoMuscular : '' };
+      });
+
+      setItens(itensComGrupo);
     } catch (error) {
       console.error(error);
       toast.error('Erro ao carregar os dados da ficha.');
@@ -163,15 +173,15 @@ export function FichaDetailPage() {
     }
   }
 
-  // Filtro do painel de adicionar
-  const exerciciosFiltrados = grupoFiltro
-      ? exerciciosDisponiveis.filter(ex => ex.grupoMuscular === grupoFiltro)
+  // Filtro para o painel de adicionar (Direita)
+  const exerciciosDisponiveisFiltrados = grupoFiltroAdicionar
+      ? exerciciosDisponiveis.filter(ex => ex.grupoMuscular === grupoFiltroAdicionar)
       : exerciciosDisponiveis;
 
-  // NOVO: Filtro da lista montada
-  const itensFiltrados = itens.filter(item =>
-      item.exercicioNome.toLowerCase().includes(filtroLista.toLowerCase())
-  );
+  // NOVO: Filtro para a lista de montados (Esquerda)
+  const itensFiltrados = grupoFiltroLista
+      ? itens.filter(item => item.grupoMuscular === grupoFiltroLista)
+      : itens;
 
   if (loading) return <p style={{ padding: '2rem' }}>Carregando treino...</p>;
 
@@ -180,25 +190,39 @@ export function FichaDetailPage() {
         <button onClick={() => navigate(-1)} className={styles.backBtn}>← Voltar</button>
 
         <div className={styles.layout}>
-          {/* COLUNA ESQUERDA */}
-          <div className={styles.treinoList}>
-            <h2>Treino Montado</h2>
 
-            {/* NOVO CAMPO DE FILTRO AQUI */}
-            <div className={styles.filtroLista}>
-              <input
-                  type="text"
-                  placeholder="Filtrar exercícios da ficha..."
-                  value={filtroLista}
-                  onChange={(e) => setFiltroLista(e.target.value)}
-              />
+          {/* COLUNA ESQUERDA: TREINO MONTADO */}
+          <div className={styles.treinoList}>
+            <div className={styles.headerLista}>
+              <h2>Treino Montado</h2>
+
+              {/* NOVO FILTRO AQUI */}
+              <select
+                  value={grupoFiltroLista}
+                  onChange={e => setGrupoFiltroLista(e.target.value)}
+                  className={styles.selectFiltro}
+              >
+                <option value="">Todos os grupos</option>
+                <option value="Peitoral">Peitoral</option>
+                <option value="Costas">Costas</option>
+                <option value="Pernas">Pernas</option>
+                <option value="Ombros">Ombros</option>
+                <option value="Bíceps">Bíceps</option>
+                <option value="Tríceps">Tríceps</option>
+                <option value="Abdômen">Abdômen</option>
+                <option value="Glúteos">Glúteos</option>
+                <option value="Panturrilha">Panturrilha</option>
+                <option value="Cardio">Cardio</option>
+              </select>
             </div>
 
             {itens.length === 0 ? (
                 <p className={styles.empty}>Nenhum exercício adicionado.</p>
+            ) : itensFiltrados.length === 0 ? (
+                <p className={styles.empty}>Nenhum exercício deste grupo na ficha.</p>
             ) : (
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                  <SortableContext items={itens.map(i => i.id)} strategy={verticalListSortingStrategy}>
+                  <SortableContext items={itensFiltrados.map(i => i.id)} strategy={verticalListSortingStrategy}>
                     <div className={styles.items}>
                       {itensFiltrados.map(item => (
                           <SortableItem key={item.id} item={item} onRemove={handleRemoverItem} />
@@ -209,14 +233,14 @@ export function FichaDetailPage() {
             )}
           </div>
 
-          {/* COLUNA DIREITA (FILTRO E ADICIONAR) */}
+          {/* COLUNA DIREITA: ADICIONAR EXERCÍCIO */}
           <div className={styles.addPanel}>
             <h2>Adicionar Exercício</h2>
             <form onSubmit={handleAdicionarExercicio} className={styles.form}>
 
               <div className={styles.field}>
                 <label>Filtrar por Grupo</label>
-                <select value={grupoFiltro} onChange={e => setGrupoFiltro(e.target.value)}>
+                <select value={grupoFiltroAdicionar} onChange={e => setGrupoFiltroAdicionar(e.target.value)}>
                   <option value="">Todos os grupos</option>
                   <option value="Peitoral">Peitoral</option>
                   <option value="Costas">Costas</option>
@@ -235,7 +259,7 @@ export function FichaDetailPage() {
                 <label>Exercício</label>
                 <select value={exercicioId} onChange={e => setExercicioId(e.target.value)}>
                   <option value="">Selecione...</option>
-                  {exerciciosFiltrados.map(ex => (
+                  {exerciciosDisponiveisFiltrados.map(ex => (
                       <option key={ex.id} value={ex.id}>{ex.nome} ({ex.grupoMuscular})</option>
                   ))}
                 </select>
