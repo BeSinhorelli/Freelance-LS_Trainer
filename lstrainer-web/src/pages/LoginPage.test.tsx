@@ -1,41 +1,31 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { LoginPage } from './LoginPage';
 import { BrowserRouter } from 'react-router-dom';
 
-// Mock sem a variável 'login'
+// Mock do useAuth para evitar problemas com o contexto de autenticação real
 vi.mock('../hooks/useAuth', () => ({
-  useAuth: () => ({}),
+  useAuth: () => ({
+    isAuthenticated: false,
+  }),
 }));
 
 describe('LoginPage', () => {
-  it('deve renderizar o formulário de login', () => {
+  it('deve renderizar a tela de login com o botão do Google', () => {
     render(
         <BrowserRouter>
           <LoginPage />
         </BrowserRouter>
     );
 
+    // Verifica se o título principal está na tela
     expect(screen.getByText('LS Trainer')).toBeInTheDocument();
-    expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
-    expect(screen.getByLabelText('Senha')).toBeInTheDocument();
-  });
 
-  it('deve permitir digitar nos campos', () => {
-    render(
-        <BrowserRouter>
-          <LoginPage />
-        </BrowserRouter>
-    );
+    // Verifica se a instrução de acesso está na tela
+    expect(screen.getByText('Acesse com a sua conta do Google para gerenciar seus alunos.')).toBeInTheDocument();
 
-    const emailInput = screen.getByLabelText('E-mail');
-    const senhaInput = screen.getByLabelText('Senha');
-
-    fireEvent.change(emailInput, { target: { value: 'teste@teste.com' } });
-    fireEvent.change(senhaInput, { target: { value: '123456' } });
-
-    expect(emailInput).toHaveValue('teste@teste.com');
-    expect(senhaInput).toHaveValue('123456');
+    // Verifica se o botão do Google está na tela
+    expect(screen.getByText('Entrar com Google')).toBeInTheDocument();
   });
 });
