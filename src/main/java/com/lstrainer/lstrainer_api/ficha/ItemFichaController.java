@@ -46,7 +46,6 @@ public class ItemFichaController {
         return ResponseEntity.noContent().build();
     }
 
-    // NOVO ENDPOINT PARA REORDENAR
     @PutMapping("/reordenar")
     public ResponseEntity<Void> reordenar(
             @PathVariable Long fichaId,

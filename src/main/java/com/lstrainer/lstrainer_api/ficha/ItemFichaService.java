@@ -78,7 +78,6 @@ public class ItemFichaService {
         itemRepository.delete(item);
     }
 
-    // NOVO MÉTODO PARA REORDENAR
     @Transactional
     public void reordenar(Long fichaId, List<Long> idsNaOrdem, Long professorId) {
         fichaRepository.findByIdAndProfessorId(fichaId, professorId)
@@ -89,7 +88,7 @@ public class ItemFichaService {
             ItemFichaTreino item = itemRepository.findById(itemId)
                     .orElseThrow(() -> new ResourceNotFoundException("Item da Ficha", itemId));
             
-            item.setOrdem(i + 1); // Recalcula a ordem com base na nova posição
+            item.setOrdem(i + 1);
         }
     }
 }
