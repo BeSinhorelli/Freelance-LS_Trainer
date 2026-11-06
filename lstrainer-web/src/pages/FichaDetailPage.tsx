@@ -3,19 +3,19 @@ import type { FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import toast from 'react-hot-toast';
-import { 
-  DndContext, 
-  closestCenter, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
-  useSensors 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors
 } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
-import { 
-  arrayMove, 
-  SortableContext, 
-  sortableKeyboardCoordinates, 
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   useSortable
 } from '@dnd-kit/sortable';
@@ -41,24 +41,24 @@ function SortableItem({ item, onRemove }: { item: ItemFicha, onRemove: (id: numb
   };
 
   return (
-    <div ref={setNodeRef} style={style} className={styles.itemCard}>
-      <div className={styles.itemHeader}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div {...attributes} {...listeners} style={{ cursor: 'grab', padding: '0.5rem', fontSize: '1.2rem', color: '#94a3b8' }}>
-            ⠿
+      <div ref={setNodeRef} style={style} className={styles.itemCard}>
+        <div className={styles.itemHeader}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div {...attributes} {...listeners} style={{ cursor: 'grab', padding: '0.5rem', fontSize: '1.2rem', color: '#94a3b8' }}>
+              ⠿
+            </div>
+            <h3>{item.ordem}. {item.exercicioNome}</h3>
           </div>
-          <h3>{item.ordem}. {item.exercicioNome}</h3>
+          <button onClick={() => onRemove(item.id)} className={styles.deleteBtn}>🗑️</button>
         </div>
-        <button onClick={() => onRemove(item.id)} className={styles.deleteBtn}>🗑️</button>
+        <div className={styles.itemDetails}>
+          <span><strong>Séries:</strong> {item.series}</span>
+          <span><strong>Reps:</strong> {item.repeticoes}</span>
+          {item.carga && <span><strong>Carga:</strong> {item.carga}</span>}
+          {item.descansoSegundos && <span><strong>Descanso:</strong> {item.descansoSegundos}s</span>}
+        </div>
+        {item.observacoes && <p className={styles.itemObs}>📝 {item.observacoes}</p>}
       </div>
-      <div className={styles.itemDetails}>
-        <span><strong>Séries:</strong> {item.series}</span>
-        <span><strong>Reps:</strong> {item.repeticoes}</span>
-        {item.carga && <span><strong>Carga:</strong> {item.carga}</span>}
-        {item.descansoSegundos && <span><strong>Descanso:</strong> {item.descansoSegundos}s</span>}
-      </div>
-      {item.observacoes && <p className={styles.itemObs}>📝 {item.observacoes}</p>}
-    </div>
   );
 }
 
@@ -70,7 +70,9 @@ export function FichaDetailPage() {
   const [exerciciosDisponiveis, setExerciciosDisponiveis] = useState<Exercicio[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [grupoFiltro, setGrupoFiltro] = useState('');
+  // Filtros
+  const [grupoFiltro, setGrupoFiltro] = useState(''); // Para o painel de adicionar
+  const [filtroLista, setFiltroLista] = useState(''); // Para a lista de montados
 
   const [exercicioId, setExercicioId] = useState('');
   const [series, setSeries] = useState('3');
@@ -81,8 +83,8 @@ export function FichaDetailPage() {
   const [erro, setErro] = useState('');
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+      useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+      useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   async function carregarDados() {
@@ -90,7 +92,7 @@ export function FichaDetailPage() {
       setLoading(true);
       const itensRes = await api.get(`/fichas/${id}/itens`);
       setItens(itensRes.data);
-      
+
       const exRes = await api.get('/exercicios');
       setExerciciosDisponiveis(exRes.data.content || exRes.data);
     } catch (error) {
@@ -107,16 +109,16 @@ export function FichaDetailPage() {
     e.preventDefault();
     setErro('');
     if (!exercicioId) { setErro('Selecione um exercício.'); return; }
-    
+
     try {
       const proximaOrdem = itens.length > 0 ? Math.max(...itens.map(i => i.ordem)) + 1 : 1;
       await api.post(`/fichas/${id}/itens`, {
-        exercicioId: Number(exercicioId), 
-        ordem: proximaOrdem, 
+        exercicioId: Number(exercicioId),
+        ordem: proximaOrdem,
         series: Number(series),
-        repeticoes, 
-        carga: carga || null, 
-        descansoSegundos: descanso ? Number(descanso) : null, 
+        repeticoes,
+        carga: carga || null,
+        descansoSegundos: descanso ? Number(descanso) : null,
         observacoes: obs || null
       });
       setExercicioId(''); setCarga(''); setObs('');
@@ -128,128 +130,146 @@ export function FichaDetailPage() {
 
   async function handleRemoverItem(itemId: number) {
     if (!window.confirm('Remover este exercício?')) return;
-    try { 
-      await api.delete(`/fichas/${id}/itens/${itemId}`); 
-      carregarDados(); 
-    } catch (error) { 
-      toast.error('Erro ao remover exercício.'); 
+    try {
+      await api.delete(`/fichas/${id}/itens/${itemId}`);
+      carregarDados();
+    } catch (error) {
+      toast.error('Erro ao remover exercício.');
     }
   }
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-    
+
     if (over && active.id !== over.id) {
       const oldIndex = itens.findIndex((i) => i.id === active.id);
       const newIndex = itens.findIndex((i) => i.id === over.id);
-      
+
       const novaLista = arrayMove(itens, oldIndex, newIndex).map((item, index) => ({
         ...item,
         ordem: index + 1
       }));
-      
+
       setItens(novaLista);
 
       try {
         const idsNaOrdem = novaLista.map(item => item.id);
-        // Enviando a lista pura
         await api.put(`/fichas/${id}/itens/reordenar`, idsNaOrdem);
         toast.success('Ordem salva!');
       } catch (error) {
         toast.error('Erro ao salvar a ordem.');
-        carregarDados(); 
+        carregarDados();
       }
     }
   }
 
+  // Filtro do painel de adicionar
   const exerciciosFiltrados = grupoFiltro
-    ? exerciciosDisponiveis.filter(ex => ex.grupoMuscular === grupoFiltro)
-    : exerciciosDisponiveis;
+      ? exerciciosDisponiveis.filter(ex => ex.grupoMuscular === grupoFiltro)
+      : exerciciosDisponiveis;
+
+  // NOVO: Filtro da lista montada
+  const itensFiltrados = itens.filter(item =>
+      item.exercicioNome.toLowerCase().includes(filtroLista.toLowerCase())
+  );
 
   if (loading) return <p style={{ padding: '2rem' }}>Carregando treino...</p>;
 
   return (
-    <div className={styles.container}>
-      <button onClick={() => navigate(-1)} className={styles.backBtn}>← Voltar</button>
-      
-      <div className={styles.layout}>
-        <div className={styles.treinoList}>
-          <h2>Treino Montado</h2>
-          {itens.length === 0 ? (
-            <p className={styles.empty}>Nenhum exercício adicionado.</p>
-          ) : (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={itens.map(i => i.id)} strategy={verticalListSortingStrategy}>
-                <div className={styles.items}>
-                  {itens.map(item => (
-                    <SortableItem key={item.id} item={item} onRemove={handleRemoverItem} />
+      <div className={styles.container}>
+        <button onClick={() => navigate(-1)} className={styles.backBtn}>← Voltar</button>
+
+        <div className={styles.layout}>
+          {/* COLUNA ESQUERDA */}
+          <div className={styles.treinoList}>
+            <h2>Treino Montado</h2>
+
+            {/* NOVO CAMPO DE FILTRO AQUI */}
+            <div className={styles.filtroLista}>
+              <input
+                  type="text"
+                  placeholder="Filtrar exercícios da ficha..."
+                  value={filtroLista}
+                  onChange={(e) => setFiltroLista(e.target.value)}
+              />
+            </div>
+
+            {itens.length === 0 ? (
+                <p className={styles.empty}>Nenhum exercício adicionado.</p>
+            ) : (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={itens.map(i => i.id)} strategy={verticalListSortingStrategy}>
+                    <div className={styles.items}>
+                      {itensFiltrados.map(item => (
+                          <SortableItem key={item.id} item={item} onRemove={handleRemoverItem} />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+            )}
+          </div>
+
+          {/* COLUNA DIREITA (FILTRO E ADICIONAR) */}
+          <div className={styles.addPanel}>
+            <h2>Adicionar Exercício</h2>
+            <form onSubmit={handleAdicionarExercicio} className={styles.form}>
+
+              <div className={styles.field}>
+                <label>Filtrar por Grupo</label>
+                <select value={grupoFiltro} onChange={e => setGrupoFiltro(e.target.value)}>
+                  <option value="">Todos os grupos</option>
+                  <option value="Peitoral">Peitoral</option>
+                  <option value="Costas">Costas</option>
+                  <option value="Pernas">Pernas</option>
+                  <option value="Ombros">Ombros</option>
+                  <option value="Bíceps">Bíceps</option>
+                  <option value="Tríceps">Tríceps</option>
+                  <option value="Abdômen">Abdômen</option>
+                  <option value="Glúteos">Glúteos</option>
+                  <option value="Panturrilha">Panturrilha</option>
+                  <option value="Cardio">Cardio</option>
+                </select>
+              </div>
+
+              <div className={styles.field}>
+                <label>Exercício</label>
+                <select value={exercicioId} onChange={e => setExercicioId(e.target.value)}>
+                  <option value="">Selecione...</option>
+                  {exerciciosFiltrados.map(ex => (
+                      <option key={ex.id} value={ex.id}>{ex.nome} ({ex.grupoMuscular})</option>
                   ))}
+                </select>
+              </div>
+
+              <div className={styles.row}>
+                <div className={styles.field}>
+                  <label>Séries</label>
+                  <input type="number" min="1" value={series} onChange={e => setSeries(e.target.value)} required />
                 </div>
-              </SortableContext>
-            </DndContext>
-          )}
-        </div>
-
-        <div className={styles.addPanel}>
-          <h2>Adicionar Exercício</h2>
-          <form onSubmit={handleAdicionarExercicio} className={styles.form}>
-            
-            <div className={styles.field}>
-              <label>Filtrar por Grupo</label>
-              <select value={grupoFiltro} onChange={e => setGrupoFiltro(e.target.value)}>
-                <option value="">Todos os grupos</option>
-                <option value="Peitoral">Peitoral</option>
-                <option value="Costas">Costas</option>
-                <option value="Pernas">Pernas</option>
-                <option value="Ombros">Ombros</option>
-                <option value="Bíceps">Bíceps</option>
-                <option value="Tríceps">Tríceps</option>
-                <option value="Abdômen">Abdômen</option>
-                <option value="Glúteos">Glúteos</option>
-                <option value="Panturrilha">Panturrilha</option>
-                <option value="Cardio">Cardio</option>
-              </select>
-            </div>
-
-            <div className={styles.field}>
-              <label>Exercício</label>
-              <select value={exercicioId} onChange={e => setExercicioId(e.target.value)}>
-                <option value="">Selecione...</option>
-                {exerciciosFiltrados.map(ex => (
-                  <option key={ex.id} value={ex.id}>{ex.nome} ({ex.grupoMuscular})</option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <label>Séries</label>
-                <input type="number" min="1" value={series} onChange={e => setSeries(e.target.value)} required />
+                <div className={styles.field}>
+                  <label>Repetições</label>
+                  <input type="text" value={repeticoes} onChange={e => setRepeticoes(e.target.value)} required maxLength={30} />
+                </div>
+              </div>
+              <div className={styles.row}>
+                <div className={styles.field}>
+                  <label>Carga</label>
+                  <input type="text" value={carga} onChange={e => setCarga(e.target.value)} maxLength={50} />
+                </div>
+                <div className={styles.field}>
+                  <label>Descanso (seg)</label>
+                  <input type="number" value={descanso} onChange={e => setDescanso(e.target.value)} />
+                </div>
               </div>
               <div className={styles.field}>
-                <label>Repetições</label>
-                <input type="text" value={repeticoes} onChange={e => setRepeticoes(e.target.value)} required maxLength={30} />
+                <label>Observações</label>
+                <input type="text" value={obs} onChange={e => setObs(e.target.value)} maxLength={1000} />
               </div>
-            </div>
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <label>Carga</label>
-                <input type="text" value={carga} onChange={e => setCarga(e.target.value)} maxLength={50} />
-              </div>
-              <div className={styles.field}>
-                <label>Descanso (seg)</label>
-                <input type="number" value={descanso} onChange={e => setDescanso(e.target.value)} />
-              </div>
-            </div>
-            <div className={styles.field}>
-              <label>Observações</label>
-              <input type="text" value={obs} onChange={e => setObs(e.target.value)} maxLength={1000} />
-            </div>
-            {erro && <span className={styles.erro}>{erro}</span>}
-            <button type="submit" className={styles.addBtn}>Adicionar à Ficha</button>
-          </form>
+              {erro && <span className={styles.erro}>{erro}</span>}
+              <button type="submit" className={styles.addBtn}>Adicionar à Ficha</button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
   );
 }

@@ -208,3 +208,19 @@
     position: static;
   }
 }
+.filtroLista {
+  margin-bottom: 1rem;
+}
+
+.filtroLista input {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.filtroLista input:focus {
+  outline: none;
+  border-color: #1e40af;
+}
