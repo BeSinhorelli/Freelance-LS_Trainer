@@ -4,7 +4,8 @@ import { api } from '../api/client';
 import { FichaModal } from '../components/FichaModal';
 import { AvaliacaoModal } from '../components/AvaliacaoModal';
 import { CardioModal } from '../components/CardioModal';
-import { Calendario } from '../components/Calendario'; // Importando o novo componente
+import { Calendario } from '../components/Calendario';
+import { TreinoAgendadoModal } from '../components/TreinoAgendadoModal';
 import styles from './AlunoDetailPage.module.css';
 
 interface Aluno {
@@ -46,7 +47,19 @@ interface TreinoAgendado {
   id: number;
   data: string;
   nomeTreino: string;
-  itens: any[];
+  itens: ItemTreinoAgendado[];
+}
+
+interface ItemTreinoAgendado {
+  id: number;
+  exercicioId: number;
+  exercicioNome: string;
+  ordem: number;
+  series: number;
+  repeticoes: string;
+  carga?: string;
+  descansoSegundos?: number;
+  observacoes?: string;
 }
 
 export function AlunoDetailPage() {
@@ -61,6 +74,13 @@ export function AlunoDetailPage() {
   const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [cardios, setCardios] = useState<Cardio[]>([]);
   const [treinosAgendados, setTreinosAgendados] = useState<TreinoAgendado[]>([]);
+  const [dataSelecionada, setDataSelecionada] = useState(() => {
+    const hoje = new Date();
+    return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+  });
+  const [treinoEditando, setTreinoEditando] = useState<TreinoAgendado | null>(null);
+  const [isTreinoModalOpen, setIsTreinoModalOpen] = useState(false);
+  const [mostrarTreinos, setMostrarTreinos] = useState(true);
   const [loading, setLoading] = useState(true);
   
   // Modais
@@ -124,6 +144,10 @@ export function AlunoDetailPage() {
     }
   }
 
+  function formatarData(data: string) {
+    return new Date(`${data}T00:00:00`).toLocaleDateString('pt-BR');
+  }
+
   if (loading) return <p>Carregando...</p>;
   if (!aluno) return <p>Aluno não encontrado.</p>;
 
@@ -183,46 +207,83 @@ export function AlunoDetailPage() {
       {/* NOVA ABA AGENDA */}
       {abaAtiva === 'agenda' && (
         <div className={styles.section} style={{ flexDirection: 'row', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          
-          {/* Coluna do Calendário */}
-          <div style={{ flex: 1, minWidth: '300px' }}>
-            <h2>Calendário de Treinos</h2>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1rem' }}>
-              Os dias com treinos agendados ficam verdes. Vá em "Fichas" para montar e agendar novos treinos.
-            </p>
-            <Calendario 
-              onSelectDate={(date) => console.log("Data selecionada:", date)} 
-              treinosAgendados={treinosAgendados} 
-            />
-          </div>
-
-          {/* Coluna da Lista de Treinos Agendados */}
           <div style={{ flex: 1, minWidth: '300px' }}>
             <div className={styles.sectionHeader}>
-              <h2>Treinos Agendados</h2>
+              <h2>Calendário de Treinos</h2>
+              <button
+                className={styles.newBtn}
+                onClick={() => { setTreinoEditando(null); setIsTreinoModalOpen(true); }}
+              >
+                + Agendar treino
+              </button>
+            </div>
+            <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1rem' }}>
+              Selecione uma data no calendário. Dias verdes já têm treinos agendados.
+            </p>
+            <Calendario
+              onSelectDate={setDataSelecionada}
+              treinosAgendados={treinosAgendados}
+              selectedDate={dataSelecionada}
+            />
+            <p style={{ color: '#475569', marginTop: '0.75rem' }}>
+              Data selecionada: <strong>{formatarData(dataSelecionada)}</strong>
+            </p>
+          </div>
+
+          <div style={{ flex: 1, minWidth: '300px' }}>
+            <div className={styles.sectionHeader}>
+              <h2>Treinos agendados ({treinosAgendados.length})</h2>
+              <button
+                type="button"
+                className={styles.viewBtn}
+                onClick={() => setMostrarTreinos(!mostrarTreinos)}
+                aria-expanded={mostrarTreinos}
+              >
+                {mostrarTreinos ? 'Ocultar lista' : 'Listar treinos'}
+              </button>
             </div>
 
-            {treinosAgendados.length === 0 ? (
+            {mostrarTreinos && (treinosAgendados.length === 0 ? (
               <p className={styles.empty}>Nenhum treino agendado.</p>
             ) : (
               <div className={styles.fichasList} style={{ marginTop: '1rem' }}>
-                {treinosAgendados.map((treino) => (
+                {[...treinosAgendados].sort((a, b) => a.data.localeCompare(b.data)).map((treino) => (
                   <div key={treino.id} className={styles.fichaCard}>
                     <div>
                       <h3>{treino.nomeTreino}</h3>
-                      <p><strong>Data:</strong> {new Date(treino.data).toLocaleDateString('pt-BR')}</p>
+                      <p><strong>Data:</strong> {formatarData(treino.data)}</p>
                       <p><strong>Exercícios:</strong> {treino.itens.length} exercícios</p>
+                      <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.25rem', color: '#475569', fontSize: '0.9rem' }}>
+                        {[...treino.itens].sort((a, b) => a.ordem - b.ordem).map((item) => (
+                          <li key={item.id}>
+                            {item.exercicioNome} — {item.series} séries × {item.repeticoes}
+                            {item.carga ? `, ${item.carga}` : ''}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <button 
-                      onClick={() => handleRemoverTreinoAgendado(treino.id)}
-                      style={{ background: '#fee2e2', color: '#dc2626', border: 'none', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer' }}
-                    >
-                      🗑️
-                    </button>
+                    <div className={styles.fichaStatus}>
+                      <button
+                        type="button"
+                        aria-label={`Editar ${treino.nomeTreino}`}
+                        onClick={() => { setTreinoEditando(treino); setIsTreinoModalOpen(true); }}
+                        style={{ background: '#f1f5f9', color: '#1e40af', border: 'none', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer' }}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Excluir ${treino.nomeTreino}`}
+                        onClick={() => handleRemoverTreinoAgendado(treino.id)}
+                        style={{ background: '#fee2e2', color: '#dc2626', border: 'none', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer' }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
-            )}
+            ))}
           </div>
         </div>
       )}
@@ -285,6 +346,14 @@ export function AlunoDetailPage() {
       <FichaModal isOpen={isFichaModalOpen} onClose={() => setIsFichaModalOpen(false)} onSuccess={carregarDados} alunoId={id} fichaParaEditar={fichaEditando} />
       <AvaliacaoModal isOpen={isAvaliacaoModalOpen} onClose={() => setIsAvaliacaoModalOpen(false)} onSuccess={carregarDados} alunoId={id} avaliacaoParaEditar={avaliacaoEditando} />
       <CardioModal isOpen={isCardioModalOpen} onClose={() => setIsCardioModalOpen(false)} onSuccess={carregarDados} alunoId={id} cardioParaEditar={cardioEditando} />
+      <TreinoAgendadoModal
+        isOpen={isTreinoModalOpen}
+        onClose={() => setIsTreinoModalOpen(false)}
+        onSuccess={carregarDados}
+        alunoId={id}
+        dataInicial={dataSelecionada}
+        treinoParaEditar={treinoEditando}
+      />
     </div>
   );
 }

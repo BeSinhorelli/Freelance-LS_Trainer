@@ -31,6 +31,14 @@ public class TreinoAgendadoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(request, user.getProfessorId()));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<TreinoAgendadoResponse> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody TreinoAgendadoRequest request,
+            @AuthenticationPrincipal ProfessorUserDetails user) {
+        return ResponseEntity.ok(service.atualizar(id, request, user.getProfessorId()));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id, @AuthenticationPrincipal ProfessorUserDetails user) {
         service.deletar(id, user.getProfessorId());

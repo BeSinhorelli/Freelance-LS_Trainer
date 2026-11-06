@@ -52,12 +52,33 @@ public class TreinoAgendadoService {
                 .build();
 
         treino = treinoRepository.save(treino);
+        adicionarItens(treino, request, professorId);
 
+        return TreinoAgendadoResponse.from(treinoRepository.save(treino));
+    }
+
+    @Transactional
+    public TreinoAgendadoResponse atualizar(Long id, TreinoAgendadoRequest request, Long professorId) {
+        TreinoAgendado treino = treinoRepository.findByIdAndProfessorId(id, professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Treino Agendado", id));
+        Aluno aluno = alunoRepository.findByIdAndProfessorId(request.alunoId(), professorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Aluno", request.alunoId()));
+
+        treino.setAluno(aluno);
+        treino.setData(request.data());
+        treino.setNomeTreino(request.nomeTreino());
+        treino.getItens().clear();
+        adicionarItens(treino, request, professorId);
+
+        return TreinoAgendadoResponse.from(treinoRepository.save(treino));
+    }
+
+    private void adicionarItens(TreinoAgendado treino, TreinoAgendadoRequest request, Long professorId) {
         int ordem = 1;
         for (var itemReq : request.itens()) {
             Exercicio exercicio = exercicioRepository.findByIdAndProfessorId(itemReq.exercicioId(), professorId)
                     .orElseThrow(() -> new ResourceNotFoundException("Exercício", itemReq.exercicioId()));
-            
+
             ItemTreinoAgendado item = ItemTreinoAgendado.builder()
                     .treinoAgendado(treino).exercicio(exercicio).ordem(ordem++)
                     .series(itemReq.series()).repeticoes(itemReq.repeticoes()).carga(itemReq.carga())
@@ -65,8 +86,6 @@ public class TreinoAgendadoService {
                     .build();
             treino.getItens().add(item);
         }
-
-        return TreinoAgendadoResponse.from(treinoRepository.save(treino));
     }
 
     @Transactional

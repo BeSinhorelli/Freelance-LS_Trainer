@@ -3,10 +3,11 @@ import styles from './Calendario.module.css';
 
 interface CalendarioProps {
   onSelectDate: (date: string) => void;
-  treinosAgendados: any[]; // Lista de treinos para marcar os dias com bolinha
+  treinosAgendados: { data: string }[];
+  selectedDate?: string;
 }
 
-export function Calendario({ onSelectDate, treinosAgendados }: CalendarioProps) {
+export function Calendario({ onSelectDate, treinosAgendados, selectedDate }: CalendarioProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const year = currentDate.getFullYear();
@@ -31,12 +32,10 @@ export function Calendario({ onSelectDate, treinosAgendados }: CalendarioProps) 
   }
 
   function handleDayClick(day: number) {
-    // Formata a data para YYYY-MM-DD (padrão do banco)
     const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     onSelectDate(formattedDate);
   }
 
-  // Verifica se um dia tem treino agendado
   function hasTreino(day: number) {
     const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     return treinosAgendados.some(t => t.data === formattedDate);
@@ -48,9 +47,9 @@ export function Calendario({ onSelectDate, treinosAgendados }: CalendarioProps) 
   return (
     <div className={styles.calendarioContainer}>
       <div className={styles.header}>
-        <button onClick={prevMonth} className={styles.navBtn}>{"<"}</button>
+        <button type="button" onClick={prevMonth} className={styles.navBtn} aria-label="Mês anterior">{"<"}</button>
         <h3>{monthNames[month]} {year}</h3>
-        <button onClick={nextMonth} className={styles.navBtn}>{">"}</button>
+        <button type="button" onClick={nextMonth} className={styles.navBtn} aria-label="Próximo mês">{">"}</button>
       </div>
 
       <div className={styles.weekDays}>
@@ -62,8 +61,11 @@ export function Calendario({ onSelectDate, treinosAgendados }: CalendarioProps) 
         {days.map(day => (
           <button
             key={day}
-            className={`${styles.dayBtn} ${hasTreino(day) ? styles.hasTreino : ''}`}
+            type="button"
+            className={`${styles.dayBtn} ${hasTreino(day) ? styles.hasTreino : ''} ${selectedDate === `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` ? styles.selectedDay : ''}`}
             onClick={() => handleDayClick(day)}
+            aria-label={`${day} de ${monthNames[month]} de ${year}${hasTreino(day) ? ', com treino agendado' : ''}`}
+            aria-pressed={selectedDate === `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`}
           >
             {day}
           </button>
