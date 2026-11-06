@@ -1,6 +1,5 @@
 package com.lstrainer.lstrainer_api.ficha;
 
-import com.lstrainer.lstrainer_api.config.SanitizationService;
 import com.lstrainer.lstrainer_api.exception.BusinessException;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.exercicio.Exercicio;
@@ -18,16 +17,13 @@ public class ItemFichaService {
     private final ItemFichaTreinoRepository itemRepository;
     private final FichaTreinoRepository fichaRepository;
     private final ExercicioRepository exercicioRepository;
-    private final SanitizationService sanitizer; // INJETADO
 
     public ItemFichaService(ItemFichaTreinoRepository itemRepository,
                             FichaTreinoRepository fichaRepository,
-                            ExercicioRepository exercicioRepository,
-                            SanitizationService sanitizer) {
+                            ExercicioRepository exercicioRepository) {
         this.itemRepository = itemRepository;
         this.fichaRepository = fichaRepository;
         this.exercicioRepository = exercicioRepository;
-        this.sanitizer = sanitizer;
     }
 
     @Transactional(readOnly = true)
@@ -61,10 +57,10 @@ public class ItemFichaService {
                 .exercicio(exercicio)
                 .ordem(request.ordem())
                 .series(request.series())
-                .repeticoes(sanitizer.clean(request.repeticoes()))
-                .carga(sanitizer.clean(request.carga()))
+                .repeticoes(request.repeticoes())
+                .carga(request.carga())
                 .descansoSegundos(request.descansoSegundos())
-                .observacoes(sanitizer.clean(request.observacoes()))
+                .observacoes(request.observacoes())
                 .build();
 
         return ItemFichaResponse.from(itemRepository.save(item));

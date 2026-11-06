@@ -2,7 +2,6 @@ package com.lstrainer.lstrainer_api.ficha;
 
 import com.lstrainer.lstrainer_api.aluno.Aluno;
 import com.lstrainer.lstrainer_api.aluno.AlunoRepository;
-import com.lstrainer.lstrainer_api.config.SanitizationService;
 import com.lstrainer.lstrainer_api.exception.BusinessException;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.ficha.dto.FichaTreinoRequest;
@@ -23,16 +22,13 @@ public class FichaTreinoService {
     private final FichaTreinoRepository fichaRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
-    private final SanitizationService sanitizer; // INJETADO
 
     public FichaTreinoService(FichaTreinoRepository fichaRepository,
                               AlunoRepository alunoRepository,
-                              ProfessorRepository professorRepository,
-                              SanitizationService sanitizer) {
+                              ProfessorRepository professorRepository) {
         this.fichaRepository = fichaRepository;
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;
-        this.sanitizer = sanitizer;
     }
 
     @Transactional(readOnly = true)
@@ -60,7 +56,7 @@ public class FichaTreinoService {
         FichaTreino ficha = FichaTreino.builder()
                 .aluno(aluno)
                 .professor(professor)
-                .objetivo(sanitizer.clean(request.objetivo()))
+                .objetivo(request.objetivo())
                 .status("ATIVA")
                 .dataCriacao(LocalDate.now())
                 .dataRevisao(request.dataRevisao())
@@ -80,7 +76,7 @@ public class FichaTreinoService {
             ficha.setAluno(novoAluno);
         }
 
-        ficha.setObjetivo(sanitizer.clean(request.objetivo()));
+        ficha.setObjetivo(request.objetivo());
         ficha.setDataRevisao(request.dataRevisao());
         ficha.setProximaReavaliacao(request.proximaReavaliacao());
 

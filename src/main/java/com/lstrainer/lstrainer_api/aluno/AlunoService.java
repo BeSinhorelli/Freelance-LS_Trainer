@@ -5,7 +5,6 @@ import com.lstrainer.lstrainer_api.aluno.dto.AlunoRequest;
 import com.lstrainer.lstrainer_api.aluno.dto.AlunoResponse;
 import com.lstrainer.lstrainer_api.avaliacao.AvaliacaoFisicaRepository;
 import com.lstrainer.lstrainer_api.cardio.PrescricaoCardioRepository;
-import com.lstrainer.lstrainer_api.config.SanitizationService;
 import com.lstrainer.lstrainer_api.exception.BusinessException;
 import com.lstrainer.lstrainer_api.exception.ResourceNotFoundException;
 import com.lstrainer.lstrainer_api.ficha.FichaTreino;
@@ -30,7 +29,6 @@ public class AlunoService {
     private final AvaliacaoFisicaRepository avaliacaoFisicaRepository;
     private final PrescricaoCardioRepository prescricaoCardioRepository;
     private final AgendaTreinoRepository agendaTreinoRepository;
-    private final SanitizationService sanitizer; // <-- INJETADO AQUI
 
     public AlunoService(AlunoRepository alunoRepository,
                         ProfessorRepository professorRepository,
@@ -38,8 +36,7 @@ public class AlunoService {
                         ItemFichaTreinoRepository itemFichaTreinoRepository,
                         AvaliacaoFisicaRepository avaliacaoFisicaRepository,
                         PrescricaoCardioRepository prescricaoCardioRepository,
-                        AgendaTreinoRepository agendaTreinoRepository,
-                        SanitizationService sanitizer) {
+                        AgendaTreinoRepository agendaTreinoRepository) {
         this.alunoRepository = alunoRepository;
         this.professorRepository = professorRepository;
         this.fichaTreinoRepository = fichaTreinoRepository;
@@ -47,7 +44,6 @@ public class AlunoService {
         this.avaliacaoFisicaRepository = avaliacaoFisicaRepository;
         this.prescricaoCardioRepository = prescricaoCardioRepository;
         this.agendaTreinoRepository = agendaTreinoRepository;
-        this.sanitizer = sanitizer;
     }
 
     @Transactional(readOnly = true)
@@ -70,11 +66,11 @@ public class AlunoService {
 
         Aluno aluno = Aluno.builder()
                 .professor(professor)
-                .nome(sanitizer.clean(request.nome())) // <-- LIMPEZA XSS
+                .nome(request.nome())
                 .dataNascimento(request.dataNascimento())
-                .contato(sanitizer.clean(request.contato())) // <-- LIMPEZA XSS
+                .contato(request.contato())
                 .nivelExperiencia(request.nivelExperiencia())
-                .observacoes(sanitizer.clean(request.observacoes())) // <-- LIMPEZA XSS
+                .observacoes(request.observacoes())
                 .ativo(true)
                 .build();
 
@@ -85,11 +81,11 @@ public class AlunoService {
     public AlunoResponse atualizar(Long id, AlunoRequest request, Long professorId) {
         Aluno aluno = findAlunoByIdAndProfessor(id, professorId);
 
-        aluno.setNome(sanitizer.clean(request.nome()));
+        aluno.setNome(request.nome());
         aluno.setDataNascimento(request.dataNascimento());
-        aluno.setContato(sanitizer.clean(request.contato()));
+        aluno.setContato(request.contato());
         aluno.setNivelExperiencia(request.nivelExperiencia());
-        aluno.setObservacoes(sanitizer.clean(request.observacoes()));
+        aluno.setObservacoes(request.observacoes());
 
         return AlunoResponse.from(aluno);
     }
