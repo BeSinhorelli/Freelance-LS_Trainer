@@ -25,7 +25,6 @@
   align-items: flex-start;
 }
 
-/* Coluna Esquerda */
 .treinoList {
   flex: 1;
   background: white;
@@ -106,7 +105,6 @@
   border-radius: 4px;
 }
 
-/* Coluna Direita */
 .addPanel {
   width: 350px;
   background: white;

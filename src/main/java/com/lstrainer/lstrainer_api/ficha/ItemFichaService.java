@@ -83,6 +83,15 @@ public class ItemFichaService {
         fichaRepository.findByIdAndProfessorId(fichaId, professorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ficha", fichaId));
 
+        // 1. Passo Tático: Joga todas as ordens para um valor temporário alto (ex: + 1000)
+        List<ItemFichaTreino> itensDaFicha = itemRepository.findByFichaIdOrderByOrdemAsc(fichaId);
+        for (ItemFichaTreino item : itensDaFicha) {
+            item.setOrdem(item.getOrdem() + 1000); 
+        }
+        itemRepository.saveAll(itensDaFicha);
+        itemRepository.flush(); // Força o banco a gravar as ordens temporárias
+
+        // 2. Agora aplica a nova ordem correta sem colisão
         for (int i = 0; i < idsNaOrdem.size(); i++) {
             Long itemId = idsNaOrdem.get(i);
             ItemFichaTreino item = itemRepository.findById(itemId)

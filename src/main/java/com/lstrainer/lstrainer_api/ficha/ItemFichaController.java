@@ -46,7 +46,7 @@ public class ItemFichaController {
         return ResponseEntity.noContent().build();
     }
 
-    // CORREÇÃO: Recebendo a lista diretamente (sem DTO)
+    // Recebendo a lista pura para evitar erro 400
     @PutMapping("/reordenar")
     public ResponseEntity<Void> reordenar(
             @PathVariable Long fichaId,

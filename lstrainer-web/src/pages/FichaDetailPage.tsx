@@ -152,7 +152,7 @@ export function FichaDetailPage() {
 
       try {
         const idsNaOrdem = novaLista.map(item => item.id);
-        // CORREÇÃO: Enviando a lista pura para o backend
+        // Enviando a lista pura
         await api.put(`/fichas/${id}/itens/reordenar`, idsNaOrdem);
         toast.success('Ordem salva!');
       } catch (error) {
@@ -173,7 +173,6 @@ export function FichaDetailPage() {
       <button onClick={() => navigate(-1)} className={styles.backBtn}>← Voltar</button>
       
       <div className={styles.layout}>
-        {/* COLUNA ESQUERDA */}
         <div className={styles.treinoList}>
           <h2>Treino Montado</h2>
           {itens.length === 0 ? (
@@ -191,7 +190,6 @@ export function FichaDetailPage() {
           )}
         </div>
 
-        {/* COLUNA DIREITA (FILTRO E ADICIONAR) */}
         <div className={styles.addPanel}>
           <h2>Adicionar Exercício</h2>
           <form onSubmit={handleAdicionarExercicio} className={styles.form}>
