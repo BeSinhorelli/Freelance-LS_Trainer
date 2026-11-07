@@ -86,7 +86,7 @@ export function DashboardPage() {
                 <div key={ficha.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: '#f8fafc', borderRadius: '8px', borderLeft: '3px solid #eab308' }}>
                   <div>
                     <h4 style={{ margin: 0, color: '#1e293b' }}>{ficha.alunoNome}</h4>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Objetivo: {ficha.objetivo}</p>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Nome da ficha de treino: {ficha.objetivo}</p>
                   </div>
                   <span style={{ background: '#fef08a', color: '#854d0e', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                     {new Date(ficha.proximaReavaliacao).toLocaleDateString('pt-BR')}

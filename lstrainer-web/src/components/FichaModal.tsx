@@ -74,7 +74,7 @@ export function FichaModal({ isOpen, onClose, onSuccess, alunoId, fichaParaEdita
         <h2>{fichaParaEditar ? 'Editar Ficha' : 'Nova Ficha'}</h2>
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label>Objetivo do Treino *</label>
+            <label>Nome do treino *</label>
             <input type="text" value={objetivo} onChange={e => setObjetivo(e.target.value)} required maxLength={255} />
           </div>
           <div className={styles.row}>
