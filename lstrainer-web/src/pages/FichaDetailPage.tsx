@@ -12,6 +12,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+import { GRUPOS_MUSCULARES } from '../constants/gruposMusculares';
 import styles from './FichaDetailPage.module.css';
 
 interface ItemFicha {
@@ -269,16 +270,7 @@ export function FichaDetailPage() {
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <select value={grupoFiltroLista} onChange={e => setGrupoFiltroLista(e.target.value)} className={styles.selectFiltro}>
                 <option value="">Todos os grupos</option>
-                <option value="Peitoral">Peitoral</option>
-                <option value="Costas">Costas</option>
-                <option value="Pernas">Pernas</option>
-                <option value="Ombros">Ombros</option>
-                <option value="Bíceps">Bíceps</option>
-                <option value="Tríceps">Tríceps</option>
-                <option value="Abdômen">Abdômen</option>
-                <option value="Glúteos">Glúteos</option>
-                <option value="Panturrilha">Panturrilha</option>
-                <option value="Cardio">Cardio</option>
+                {GRUPOS_MUSCULARES.map(grupo => <option key={grupo} value={grupo}>{grupo}</option>)}
               </select>
             </div>
           </div>
@@ -334,16 +326,7 @@ export function FichaDetailPage() {
                 }}
               >
                 <option value="">Todos os grupos</option>
-                <option value="Peitoral">Peitoral</option>
-                <option value="Costas">Costas</option>
-                <option value="Pernas">Pernas</option>
-                <option value="Ombros">Ombros</option>
-                <option value="Bíceps">Bíceps</option>
-                <option value="Tríceps">Tríceps</option>
-                <option value="Abdômen">Abdômen</option>
-                <option value="Glúteos">Glúteos</option>
-                <option value="Panturrilha">Panturrilha</option>
-                <option value="Cardio">Cardio</option>
+                {GRUPOS_MUSCULARES.map(grupo => <option key={grupo} value={grupo}>{grupo}</option>)}
               </select>
             </div>
 

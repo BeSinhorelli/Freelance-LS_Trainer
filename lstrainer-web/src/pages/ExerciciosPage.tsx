@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
+import { GRUPOS_MUSCULARES } from '../constants/gruposMusculares';
 import styles from './ExerciciosPage.module.css';
 
 interface Exercicio {
@@ -28,10 +29,6 @@ export function ExerciciosPage() {
   const [descricao, setDescricao] = useState('');
   const [instrucoes, setInstrucoes] = useState('');
   const [erro, setErro] = useState('');
-
-  const gruposMusculares = [
-    'Peitoral', 'Costas', 'Pernas', 'Ombros', 'Bíceps', 'Tríceps', 'Abdômen', 'Glúteos', 'Panturrilha', 'Cardio'
-  ];
 
   useEffect(() => {
     carregarExercicios();
@@ -158,7 +155,7 @@ export function ExerciciosPage() {
           style={{ padding: '0.7rem', borderRadius: '6px', border: '1px solid #cbd5e1', color: '#475569', minWidth: '150px' }}
         >
           <option value="">Todos os Grupos</option>
-          {gruposMusculares.map(g => <option key={g} value={g}>{g}</option>)}
+          {GRUPOS_MUSCULARES.map(g => <option key={g} value={g}>{g}</option>)}
         </select>
 
         <select 
@@ -217,7 +214,7 @@ export function ExerciciosPage() {
                   style={{ padding: '0.7rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}
                 >
                   <option value="">Selecione...</option>
-                  {gruposMusculares.map(g => <option key={g} value={g}>{g}</option>)}
+                  {GRUPOS_MUSCULARES.map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
               </div>
 

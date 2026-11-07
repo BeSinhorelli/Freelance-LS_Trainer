@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import toast from 'react-hot-toast';
 import { api } from '../api/client';
+import { GRUPOS_MUSCULARES } from '../constants/gruposMusculares';
 import styles from './TreinoAgendadoModal.module.css';
 
 interface Exercicio {
@@ -146,11 +147,12 @@ export function TreinoAgendadoModal({
     return () => { active = false; };
   }, [isOpen, dataInicial, alunoId, treinoParaEditar]);
 
-  const gruposMusculares = [...new Set(
-    exercicios
+  const gruposMusculares = [...new Set([
+    ...GRUPOS_MUSCULARES,
+    ...exercicios
       .map((exercicio) => exercicio.grupoMuscular?.trim())
       .filter((grupo): grupo is string => Boolean(grupo)),
-  )].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  ])].sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
   function grupoMuscularDoItem(item: ItemTreinoForm) {
     return item.grupoMuscular

@@ -94,6 +94,42 @@ describe('TreinoAgendadoModal', () => {
     expect(screen.queryByRole('option', { name: 'Agachamento — Pernas' })).not.toBeInTheDocument();
   });
 
+  it('oferece coxa e antebraço na seleção de grupo muscular da agenda', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({
+        data: {
+          content: [
+            { id: 9, nome: 'Cadeira extensora', grupoMuscular: 'Coxa' },
+            { id: 10, nome: 'Rosca de punho', grupoMuscular: 'Antebraço' },
+          ],
+        },
+      })
+      .mockResolvedValueOnce({ data: { content: [] } });
+
+    render(
+      <TreinoAgendadoModal
+        isOpen
+        onClose={vi.fn()}
+        onSuccess={vi.fn()}
+        alunoId="12"
+        dataInicial="2026-11-06"
+        treinoParaEditar={null}
+      />,
+    );
+
+    const grupoSelect = screen.getByLabelText('Grupo muscular *');
+    await screen.findByRole('option', { name: 'Coxa' });
+    expect(screen.getByRole('option', { name: 'Antebraço' })).toBeInTheDocument();
+
+    fireEvent.change(grupoSelect, { target: { value: 'Coxa' } });
+    expect(screen.getByRole('option', { name: 'Cadeira extensora — Coxa' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Rosca de punho — Antebraço' })).not.toBeInTheDocument();
+
+    fireEvent.change(grupoSelect, { target: { value: 'Antebraço' } });
+    expect(screen.getByRole('option', { name: 'Rosca de punho — Antebraço' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Cadeira extensora — Coxa' })).not.toBeInTheDocument();
+  });
+
   it('preenche automaticamente o treino e os grupos musculares ao selecionar uma ficha', async () => {
     vi.mocked(api.get)
       .mockResolvedValueOnce({
