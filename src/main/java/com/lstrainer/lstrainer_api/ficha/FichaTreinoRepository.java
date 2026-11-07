@@ -18,10 +18,21 @@ public interface FichaTreinoRepository extends JpaRepository<FichaTreino, Long> 
     Optional<FichaTreino> findByIdAndProfessorId(Long id, Long professorId);
     
     long countByProfessorIdAndStatus(Long professorId, String status);
-    long countByProfessorIdAndProximaReavaliacaoBetween(Long professorId, LocalDate inicio, LocalDate fim);
 
-    @Query("SELECT f FROM FichaTreino f JOIN FETCH f.aluno a WHERE f.professor.id = :professorId AND f.status = 'ATIVA' ORDER BY f.proximaReavaliacao ASC")
-    List<FichaTreino> buscarReavaliacoesProximas(@Param("professorId") Long professorId);
+    @Query("SELECT COUNT(DISTINCT f.aluno.id) FROM FichaTreino f " +
+            "WHERE f.professor.id = :professorId AND f.status = 'ATIVA' " +
+            "AND f.proximaReavaliacao BETWEEN :inicio AND :fim")
+    long countAlunosComReavaliacaoProxima(@Param("professorId") Long professorId,
+                                          @Param("inicio") LocalDate inicio,
+                                          @Param("fim") LocalDate fim);
+
+    @Query("SELECT f FROM FichaTreino f JOIN FETCH f.aluno a " +
+            "WHERE f.professor.id = :professorId AND f.status = 'ATIVA' " +
+            "AND f.proximaReavaliacao BETWEEN :inicio AND :fim " +
+            "ORDER BY f.proximaReavaliacao ASC, f.id ASC")
+    List<FichaTreino> buscarReavaliacoesProximas(@Param("professorId") Long professorId,
+                                                  @Param("inicio") LocalDate inicio,
+                                                  @Param("fim") LocalDate fim);
 
     // NOVO: Verifica se já existe uma ficha com o mesmo objetivo para o aluno
     boolean existsByAlunoIdAndObjetivoIgnoreCase(Long alunoId, String objetivo);

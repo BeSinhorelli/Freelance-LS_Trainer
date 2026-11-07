@@ -1,11 +1,8 @@
 package com.lstrainer.lstrainer_api.dashboard;
 
-import com.lstrainer.lstrainer_api.ficha.FichaTreinoRepository;
-import com.lstrainer.lstrainer_api.ficha.dto.FichaTreinoResponse;
 import com.lstrainer.lstrainer_api.security.ProfessorUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,11 +14,9 @@ import java.util.List;
 public class DashboardController {
 
     private final DashboardService dashboardService;
-    private final FichaTreinoRepository fichaTreinoRepository;
 
-    public DashboardController(DashboardService dashboardService, FichaTreinoRepository fichaTreinoRepository) {
+    public DashboardController(DashboardService dashboardService) {
         this.dashboardService = dashboardService;
-        this.fichaTreinoRepository = fichaTreinoRepository;
     }
 
     @GetMapping
@@ -30,16 +25,8 @@ public class DashboardController {
     }
 
     @GetMapping("/reavaliacoes")
-    @Transactional(readOnly = true) // <-- ESSENCIAL PARA O LAZY LOADING
-    public ResponseEntity<List<FichaTreinoResponse>> listarReavaliacoesProximas(
+    public ResponseEntity<List<DashboardReavaliacaoResponse>> listarReavaliacoesProximas(
             @AuthenticationPrincipal ProfessorUserDetails user) {
-        
-        List<FichaTreinoResponse> fichas = fichaTreinoRepository
-                .buscarReavaliacoesProximas(user.getProfessorId())
-                .stream()
-                .map(FichaTreinoResponse::from)
-                .toList();
-                
-        return ResponseEntity.ok(fichas);
+        return ResponseEntity.ok(dashboardService.listarReavaliacoesProximas(user.getProfessorId()));
     }
 }

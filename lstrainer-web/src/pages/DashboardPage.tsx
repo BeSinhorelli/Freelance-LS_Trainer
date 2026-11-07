@@ -8,17 +8,16 @@ interface DashboardData {
   reavaliacoesProximas: number;
 }
 
-interface Ficha {
-  id: number;
+interface Reavaliacao {
+  alunoId: number;
   alunoNome: string;
-  objetivo: string;
   proximaReavaliacao: string;
 }
 
 export function DashboardPage() {
   const { professor } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
-  const [fichas, setFichas] = useState<Ficha[]>([]);
+  const [reavaliacoes, setReavaliacoes] = useState<Reavaliacao[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,8 +26,8 @@ export function DashboardPage() {
         const response = await api.get('/dashboard');
         setData(response.data);
 
-        const fichasRes = await api.get('/dashboard/reavaliacoes');
-        setFichas(fichasRes.data);
+        const reavaliacoesRes = await api.get('/dashboard/reavaliacoes');
+        setReavaliacoes(reavaliacoesRes.data);
       } catch (error) {
         console.error('Erro ao carregar dashboard', error);
       } finally {
@@ -78,18 +77,17 @@ export function DashboardPage() {
           <h2 style={{ margin: 0, fontSize: '1.2rem', color: '#1e293b' }}>Atenção Hoje</h2>
           <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Alunos que precisam de reavaliação nos próximos 30 dias.</p>
 
-          {fichas.length === 0 ? (
-             <p style={{ fontSize: '0.9rem', color: '#94a3b8' }}>Nenhuma reavaliação agendada para este mês.</p>
+          {reavaliacoes.length === 0 ? (
+             <p style={{ fontSize: '0.9rem', color: '#94a3b8' }}>Nenhuma reavaliação agendada para os próximos 30 dias.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {fichas.map(ficha => (
-                <div key={ficha.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: '#f8fafc', borderRadius: '8px', borderLeft: '3px solid #eab308' }}>
+              {reavaliacoes.map(reavaliacao => (
+                <div key={reavaliacao.alunoId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: '#f8fafc', borderRadius: '8px', borderLeft: '3px solid #eab308' }}>
                   <div>
-                    <h4 style={{ margin: 0, color: '#1e293b' }}>{ficha.alunoNome}</h4>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Nome da ficha de treino: {ficha.objetivo}</p>
+                    <h4 style={{ margin: 0, color: '#1e293b' }}>{reavaliacao.alunoNome}</h4>
                   </div>
                   <span style={{ background: '#fef08a', color: '#854d0e', padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                    {new Date(ficha.proximaReavaliacao).toLocaleDateString('pt-BR')}
+                    {new Date(`${reavaliacao.proximaReavaliacao}T00:00:00`).toLocaleDateString('pt-BR')}
                   </span>
                 </div>
               ))}
