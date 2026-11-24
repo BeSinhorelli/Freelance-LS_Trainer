@@ -43,6 +43,12 @@ export function Layout() {
 
           <div className={styles.userInfo}>
             <span>Olá, {professor?.nome.split(' ')[0]}</span>
+            <a
+              href="https://lstrainer-api.onrender.com/oauth2/authorization/google"
+              className={styles.switchAccountBtn}
+            >
+              Trocar conta
+            </a>
             <button onClick={handleLogout} className={styles.logoutBtn}>Sair</button>
           </div>
         </header>

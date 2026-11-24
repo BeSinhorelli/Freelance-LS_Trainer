@@ -2,6 +2,13 @@ spring:
   application:
     name: lstrainer-api
 
+  security:
+    oauth2:
+      client:
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth?prompt=select_account
+
   datasource:
     url: jdbc:postgresql://localhost:5432/lstrainer
     username: lstrainer_user

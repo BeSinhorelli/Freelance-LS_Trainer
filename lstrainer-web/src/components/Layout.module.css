@@ -60,6 +60,22 @@
   font-weight: 500;
 }
 
+.switchAccountBtn {
+  background: #e0e7ff;
+  color: #1e40af;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.switchAccountBtn:hover {
+  background: #c7d2fe;
+}
+
 .logoutBtn {
   background: #fee2e2;
   color: #dc2626;

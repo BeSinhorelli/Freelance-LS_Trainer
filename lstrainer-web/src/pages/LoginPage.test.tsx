@@ -25,7 +25,7 @@ describe('LoginPage', () => {
     // Verifica se a instrução de acesso está na tela
     expect(screen.getByText('Acesse com a sua conta do Google para gerenciar seus alunos.')).toBeInTheDocument();
 
-    // Verifica se o botão do Google está na tela
-    expect(screen.getByText('Entrar com Google')).toBeInTheDocument();
+    // Verifica se o botão permite escolher explicitamente uma conta do Google
+    expect(screen.getByText('Escolher conta do Google')).toBeInTheDocument();
   });
 });

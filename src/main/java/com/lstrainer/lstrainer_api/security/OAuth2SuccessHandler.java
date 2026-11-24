@@ -57,7 +57,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String token = jwtService.generateToken(professor.getId(), professor.getEmail());
         cookieService.addAuthCookie(response, token);
 
-        // REDIRECIONA PARA O LOGIN COM O PARÂMETRO DE SUCESSO
-        getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/login?oauth=success");
+        // Depois de trocar ou escolher uma conta, volta diretamente ao dashboard.
+        getRedirectStrategy().sendRedirect(request, response, frontendUrl + "/dashboard?oauth=success");
     }
 }

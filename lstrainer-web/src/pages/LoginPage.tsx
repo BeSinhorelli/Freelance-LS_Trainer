@@ -33,7 +33,7 @@ export function LoginPage() {
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', background: '#fff', border: '2px solid #cbd5e1', padding: '0.9rem', borderRadius: '8px', textDecoration: 'none', color: '#333', fontWeight: 'bold', fontSize: '1rem', transition: 'all 0.2s' }}
         >
           <img src="https://www.google.com/favicon.ico" alt="Google" width="24" />
-          Entrar com Google
+          Escolher conta do Google
         </a>
 
         <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '1rem' }}>
